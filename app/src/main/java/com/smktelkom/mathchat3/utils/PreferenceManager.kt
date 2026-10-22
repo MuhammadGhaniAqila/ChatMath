@@ -3,17 +3,16 @@ package com.smktelkom.mathchat3.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.smktelkom.mathchat3.models.ChatMessage
+import com.smktelkom.mathchat3.models.SavedContact
 import com.smktelkom.mathchat3.models.User
 import org.json.JSONArray
 import org.json.JSONObject
 
 class PreferenceManager(context: Context) {
 
-    // File 1: Khusus menyimpan SESI login yang sedang aktif
     private val sessionPrefs: SharedPreferences =
         context.getSharedPreferences(PREF_SESSION_NAME, Context.MODE_PRIVATE)
 
-    // File 2: Khusus menyimpan DATABASE permanen seluruh akun terdaftar & pesan
     private val databasePrefs: SharedPreferences =
         context.getSharedPreferences(PREF_DATABASE_NAME, Context.MODE_PRIVATE)
 
@@ -25,16 +24,17 @@ class PreferenceManager(context: Context) {
         const val KEY_IS_SIGNED_IN = "isSignedIn"
         const val KEY_USER_ID = "userId"
         const val KEY_NAME = "name"
+        const val KEY_PHONE = "phone"
         const val KEY_EMAIL = "email"
         const val KEY_IMAGE = "image"
 
         // Permanent Database Keys
         private const val KEY_USERS_LIST_JSON = "registered_users_json"
         private const val KEY_MESSAGES_LIST_JSON = "messages_list_json"
+        private const val KEY_SAVED_CONTACTS_PREFIX = "saved_contacts_"
     }
 
     init {
-        // Otomatis masukkan 2 Akun Demo Bawaan jika database users masih kosong saat pertama kali aplikasi dijalankan
         seedPreloadedDemoAccounts()
     }
 
@@ -58,10 +58,6 @@ class PreferenceManager(context: Context) {
         return sessionPrefs.getString(key, null)
     }
 
-    /**
-     * PENTING: Saat Logout, HANYA bersihkan file Sesi "ChatMathSession".
-     * JANGAN PERNAH menghapus "ChatMathDatabase" agar data akun dan riwayat chat tetap tersimpan permanen!
-     */
     fun clearSession() {
         sessionPrefs.edit().clear().apply()
     }
@@ -76,27 +72,43 @@ class PreferenceManager(context: Context) {
             val demo1 = User(
                 id = "demo_siswa1",
                 name = "Siswa Telkom 1",
-                email = "siswa1@telkom.sch.id",
+                phoneNumber = "0811111111",
+                email = "siswa1@gmail.com",
                 password = "123456",
                 imageBase64 = AvatarGenerator.generateAvatarBase64("Siswa Telkom 1")
             )
             val demo2 = User(
                 id = "demo_siswa2",
                 name = "Siswa Telkom 2",
-                email = "siswa2@telkom.sch.id",
+                phoneNumber = "0822222222",
+                email = "siswa2@gmail.com",
                 password = "123456",
                 imageBase64 = AvatarGenerator.generateAvatarBase64("Siswa Telkom 2")
             )
+            val demo3 = User(
+                id = "demo_guru",
+                name = "Guru Matematika",
+                phoneNumber = "0833333333",
+                email = "guru.mtk@telkom.sch.id",
+                password = "123456",
+                imageBase64 = AvatarGenerator.generateAvatarBase64("Guru Matematika")
+            )
             saveUser(demo1)
             saveUser(demo2)
+            saveUser(demo3)
             FirebaseHelper.saveUser(demo1)
             FirebaseHelper.saveUser(demo2)
+            FirebaseHelper.saveUser(demo3)
         }
     }
 
     fun saveUser(user: User) {
         val users = getAllUsers().toMutableList()
-        users.removeAll { it.id == user.id || it.email.equals(user.email, ignoreCase = true) }
+        users.removeAll {
+            it.id == user.id ||
+                    it.email.equals(user.email, ignoreCase = true) ||
+                    (user.phoneNumber.isNotEmpty() && it.phoneNumber == user.phoneNumber)
+        }
         users.add(user)
 
         val jsonArray = JSONArray()
@@ -104,6 +116,7 @@ class PreferenceManager(context: Context) {
             val obj = JSONObject().apply {
                 put("id", u.id)
                 put("name", u.name)
+                put("phoneNumber", u.phoneNumber)
                 put("email", u.email)
                 put("password", u.password)
                 put("imageBase64", u.imageBase64)
@@ -124,6 +137,7 @@ class PreferenceManager(context: Context) {
                     User(
                         id = obj.optString("id"),
                         name = obj.optString("name"),
+                        phoneNumber = obj.optString("phoneNumber"),
                         email = obj.optString("email"),
                         password = obj.optString("password"),
                         imageBase64 = obj.optString("imageBase64")
@@ -136,16 +150,87 @@ class PreferenceManager(context: Context) {
         return list
     }
 
+    fun findUserByEmailOrPhone(query: String): User? {
+        val cleanQuery = query.trim()
+        return getAllUsers().firstOrNull {
+            it.email.equals(cleanQuery, ignoreCase = true) ||
+                    (it.phoneNumber.isNotEmpty() && it.phoneNumber == cleanQuery)
+        }
+    }
+
     fun findUserByEmail(email: String): User? {
-        return getAllUsers().firstOrNull { it.email.equals(email, ignoreCase = true) }
+        return findUserByEmailOrPhone(email)
     }
 
     fun getCurrentUser(): User? {
         val id = getString(KEY_USER_ID) ?: return null
         val name = getString(KEY_NAME) ?: ""
+        val phone = getString(KEY_PHONE) ?: ""
         val email = getString(KEY_EMAIL) ?: ""
         val image = getString(KEY_IMAGE) ?: ""
-        return User(id = id, name = name, email = email, imageBase64 = image)
+        return User(id = id, name = name, phoneNumber = phone, email = email, imageBase64 = image)
+    }
+
+    // =========================================================================
+    // MANAGEMENT SAVED CONTACTS (ChatMathDatabase)
+    // =========================================================================
+
+    fun saveContact(currentUserId: String, contact: SavedContact) {
+        val contacts = getSavedContacts(currentUserId).toMutableList()
+        contacts.removeAll { it.contactUserId == contact.contactUserId }
+        contacts.add(contact)
+
+        val jsonArray = JSONArray()
+        for (c in contacts) {
+            val obj = JSONObject().apply {
+                put("ownerUserId", c.ownerUserId)
+                put("contactUserId", c.contactUserId)
+                put("customAliasName", c.customAliasName)
+                put("phoneNumber", c.phoneNumber)
+                put("email", c.email)
+                put("imageBase64", c.imageBase64)
+                put("isFavorite", c.isFavorite)
+            }
+            jsonArray.put(obj)
+        }
+        databasePrefs.edit().putString(KEY_SAVED_CONTACTS_PREFIX + currentUserId, jsonArray.toString()).apply()
+    }
+
+    fun getSavedContacts(currentUserId: String): List<SavedContact> {
+        val jsonStr = databasePrefs.getString(KEY_SAVED_CONTACTS_PREFIX + currentUserId, null) ?: return emptyList()
+        val list = mutableListOf<SavedContact>()
+        try {
+            val jsonArray = JSONArray(jsonStr)
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                list.add(
+                    SavedContact(
+                        ownerUserId = obj.optString("ownerUserId"),
+                        contactUserId = obj.optString("contactUserId"),
+                        customAliasName = obj.optString("customAliasName"),
+                        phoneNumber = obj.optString("phoneNumber"),
+                        email = obj.optString("email"),
+                        imageBase64 = obj.optString("imageBase64"),
+                        isFavorite = obj.optBoolean("isFavorite", false)
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        // Urutkan otomatis: isFavorite == true selalu tampil paling atas!
+        return list.sortedWith(compareByDescending<SavedContact> { it.isFavorite }.thenBy { it.customAliasName })
+    }
+
+    fun toggleContactFavorite(currentUserId: String, contactUserId: String): Boolean {
+        val contacts = getSavedContacts(currentUserId).toMutableList()
+        val index = contacts.indexOfFirst { it.contactUserId == contactUserId }
+        if (index != -1) {
+            val updated = contacts[index].copy(isFavorite = !contacts[index].isFavorite)
+            saveContact(currentUserId, updated)
+            return updated.isFavorite
+        }
+        return false
     }
 
     // =========================================================================

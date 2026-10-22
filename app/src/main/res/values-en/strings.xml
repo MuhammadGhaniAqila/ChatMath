@@ -7,18 +7,21 @@
     <string name="create_account">Create New Account</string>
     <string name="sign_up">Sign Up</string>
     <string name="add_image">Add Image</string>
-    <string name="name_hint">Name</string>
-    <string name="email_hint">Email</string>
+    <string name="name_hint">Username</string>
+    <string name="phone_hint">Phone Number (e.g. 0811111111)</string>
+    <string name="email_hint">Google Email (e.g. student1@gmail.com)</string>
+    <string name="email_or_phone_hint">Google Email or Phone Number</string>
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="recent_conversations">Recent Conversations</string>
     <string name="no_conversations">No conversations yet.\nTap (+) to choose a friend.</string>
-    <string name="no_other_users">No other registered users yet.</string>
-    <string name="select_user">Select User</string>
+    <string name="no_other_users">No saved contacts yet.</string>
+    <string name="select_user">Contacts &amp; Favorites</string>
     <string name="type_message">Type a secret message...</string>
     <string name="tap_for_details">Tap for formula details</string>
     <string name="example_button">Example</string>
     <string name="formula_info_button">Formula Info</string>
+    <string name="button_google_signin">Quick Sign In with Google</string>
 
     <string name="menu_profile">Profile</string>
     <string name="menu_change_language">Change Language</string>

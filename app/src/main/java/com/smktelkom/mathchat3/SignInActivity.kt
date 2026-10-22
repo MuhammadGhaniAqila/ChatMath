@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.database.ValueEventListener
 import com.smktelkom.mathchat3.databinding.ActivitySignInBinding
+import com.smktelkom.mathchat3.utils.DialogHelper
 import com.smktelkom.mathchat3.utils.FirebaseHelper
 import com.smktelkom.mathchat3.utils.LocaleHelper
 import com.smktelkom.mathchat3.utils.PreferenceManager
@@ -65,18 +66,35 @@ class SignInActivity : AppCompatActivity() {
                 signIn()
             }
         }
+
+        binding.buttonGoogleSignIn.setOnClickListener {
+            DialogHelper.showGoogleSignInDialog(this, preferenceManager) { selectedUser ->
+                preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
+                preferenceManager.putString(PreferenceManager.KEY_USER_ID, selectedUser.id)
+                preferenceManager.putString(PreferenceManager.KEY_NAME, selectedUser.name)
+                preferenceManager.putString(PreferenceManager.KEY_PHONE, selectedUser.phoneNumber)
+                preferenceManager.putString(PreferenceManager.KEY_EMAIL, selectedUser.email)
+                preferenceManager.putString(PreferenceManager.KEY_IMAGE, selectedUser.imageBase64)
+
+                showToast("Sign In Berhasil")
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(intent)
+            }
+        }
     }
 
     private fun signIn() {
         loading(true)
-        val email = binding.inputEmail.text.toString().trim()
+        val query = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString().trim()
 
-        val user = preferenceManager.findUserByEmail(email)
+        val user = preferenceManager.findUserByEmailOrPhone(query)
         if (user != null && user.password == password) {
             preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
             preferenceManager.putString(PreferenceManager.KEY_USER_ID, user.id)
             preferenceManager.putString(PreferenceManager.KEY_NAME, user.name)
+            preferenceManager.putString(PreferenceManager.KEY_PHONE, user.phoneNumber)
             preferenceManager.putString(PreferenceManager.KEY_EMAIL, user.email)
             preferenceManager.putString(PreferenceManager.KEY_IMAGE, user.imageBase64)
 
@@ -107,7 +125,7 @@ class SignInActivity : AppCompatActivity() {
     private fun isValidSignInDetails(): Boolean {
         return when {
             binding.inputEmail.text.toString().trim().isEmpty() -> {
-                showToast("Masukkan Email")
+                showToast("Masukkan Email Google atau Nomor HP")
                 false
             }
             binding.inputPassword.text.toString().trim().isEmpty() -> {

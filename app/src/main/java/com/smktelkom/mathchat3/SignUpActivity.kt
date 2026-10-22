@@ -84,13 +84,14 @@ class SignUpActivity : AppCompatActivity() {
     private fun signUp() {
         loading(true)
         val name = binding.inputName.text.toString().trim()
+        val phone = binding.inputPhone.text.toString().trim()
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString().trim()
 
-        // Cek terlebih dahulu di database users apakah Email tersebut sudah pernah terdaftar
-        if (preferenceManager.findUserByEmail(email) != null) {
+        // Cek terlebih dahulu di database users apakah Email atau No HP tersebut sudah pernah terdaftar
+        if (preferenceManager.findUserByEmailOrPhone(email) != null || (phone.isNotEmpty() && preferenceManager.findUserByEmailOrPhone(phone) != null)) {
             loading(false)
-            showToast("Akun sudah terdaftar, silakan langsung Sign In!")
+            showToast("Akun atau Nomor HP sudah terdaftar, silakan langsung Sign In!")
             return
         }
 
@@ -100,6 +101,7 @@ class SignUpActivity : AppCompatActivity() {
         val user = User(
             id = UUID.randomUUID().toString(),
             name = name,
+            phoneNumber = phone,
             email = email,
             password = password,
             imageBase64 = finalImageBase64
@@ -113,6 +115,7 @@ class SignUpActivity : AppCompatActivity() {
         preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
         preferenceManager.putString(PreferenceManager.KEY_USER_ID, user.id)
         preferenceManager.putString(PreferenceManager.KEY_NAME, user.name)
+        preferenceManager.putString(PreferenceManager.KEY_PHONE, user.phoneNumber)
         preferenceManager.putString(PreferenceManager.KEY_EMAIL, user.email)
         preferenceManager.putString(PreferenceManager.KEY_IMAGE, user.imageBase64)
 
@@ -142,6 +145,10 @@ class SignUpActivity : AppCompatActivity() {
                 showToast("Masukkan Nama")
                 false
             }
+            binding.inputPhone.text.toString().trim().isEmpty() -> {
+                showToast("Masukkan Nomor Handphone")
+                false
+            }
             binding.inputEmail.text.toString().trim().isEmpty() -> {
                 showToast("Masukkan Email")
                 false
@@ -158,7 +165,7 @@ class SignUpActivity : AppCompatActivity() {
                 showToast("Password dan Konfirmasi Password harus sama")
                 false
             }
-            preferenceManager.findUserByEmail(binding.inputEmail.text.toString().trim()) != null -> {
+            preferenceManager.findUserByEmailOrPhone(binding.inputEmail.text.toString().trim()) != null -> {
                 showToast("Akun sudah terdaftar, silakan langsung Sign In!")
                 false
             }

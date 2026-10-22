@@ -90,6 +90,21 @@
                         android:textSize="14sp" />
 
                     <EditText
+                        android:id="@+id/inputPhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/background_input"
+                        android:hint="@string/phone_hint"
+                        android:importantForAutofill="no"
+                        android:inputType="phone"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:textColor="@color/primary_text"
+                        android:textColorHint="@color/secondary_text"
+                        android:textSize="14sp" />
+
+                    <EditText
                         android:id="@+id/inputEmail"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"

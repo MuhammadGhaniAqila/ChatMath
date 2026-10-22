@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.smktelkom.mathchat3.models.ChatMessage
+import com.smktelkom.mathchat3.models.SavedContact
 import com.smktelkom.mathchat3.models.User
 
 object FirebaseHelper {
@@ -17,12 +18,11 @@ object FirebaseHelper {
     private const val TAG = "ChatMathFirebase"
     private const val PATH_USERS = "users"
     private const val PATH_CHATS = "chats"
+    private const val PATH_CONTACTS = "contacts"
 
-    // Track ID pesan yang telah diberi notifikasi agar tidak duplikat saat reload
     private val notifiedMessageIds = mutableSetOf<String>()
     private var isInitialLoad = true
 
-    // Menyimpan ID receiver yang sedang aktif di ChatActivity agar tidak pop-up untuk chat yang sedang dibuka
     var currentActiveChatReceiverId: String? = null
 
     private const val DB_URL_ASIA = "https://chatmathdb-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -52,9 +52,6 @@ object FirebaseHelper {
         }
     }
 
-    /**
-     * Menyimpan data pengguna baru atau memperbarui data di Firebase Realtime Database.
-     */
     fun saveUser(user: User) {
         try {
             database.reference.child(PATH_USERS).child(user.id).setValue(user)
@@ -69,9 +66,6 @@ object FirebaseHelper {
         }
     }
 
-    /**
-     * Menyimpan pesan baru ke Firebase Realtime Database.
-     */
     fun saveChatMessage(message: ChatMessage) {
         try {
             database.reference.child(PATH_CHATS).child(message.id).setValue(message)
@@ -86,9 +80,41 @@ object FirebaseHelper {
         }
     }
 
-    /**
-     * Mendengarkan daftar seluruh pengguna terdaftar di Firebase secara Real-Time.
-     */
+    fun saveContact(currentUserId: String, contact: SavedContact) {
+        try {
+            database.reference.child(PATH_CONTACTS).child(currentUserId).child(contact.contactUserId).setValue(contact)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun listenForSavedContacts(
+        context: Context,
+        currentUserId: String,
+        preferenceManager: PreferenceManager,
+        onContactsUpdated: (List<SavedContact>) -> Unit
+    ): ValueEventListener {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val contacts = mutableListOf<SavedContact>()
+                for (child in snapshot.children) {
+                    val contact = child.getValue(SavedContact::class.java)
+                    if (contact != null) {
+                        contacts.add(contact)
+                        preferenceManager.saveContact(currentUserId, contact)
+                    }
+                }
+                onContactsUpdated(contacts.sortedWith(compareByDescending<SavedContact> { it.isFavorite }.thenBy { it.customAliasName }))
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onContactsUpdated(preferenceManager.getSavedContacts(currentUserId))
+            }
+        }
+        database.reference.child(PATH_CONTACTS).child(currentUserId).addValueEventListener(listener)
+        return listener
+    }
+
     fun listenForUsers(
         context: Context,
         preferenceManager: PreferenceManager,
@@ -101,7 +127,7 @@ object FirebaseHelper {
                     val user = child.getValue(User::class.java)
                     if (user != null) {
                         userList.add(user)
-                        preferenceManager.saveUser(user) // Sinkronisasi ke penyimpanan lokal
+                        preferenceManager.saveUser(user)
                     }
                 }
                 Log.d(TAG, "Realtime Users updated: total ${userList.size} users")
@@ -112,8 +138,6 @@ object FirebaseHelper {
                 Log.e(TAG, "Firebase listenForUsers Cancelled/Error: ${error.message} (Code: ${error.code})")
                 if (error.code == DatabaseError.PERMISSION_DENIED) {
                     showToastOnUI(context, "Firebase Error: Permission Denied! Ubah Rules di Firebase Console ke true.")
-                } else {
-                    showToastOnUI(context, "Firebase Error: ${error.message}")
                 }
                 onUsersUpdated(preferenceManager.getAllUsers())
             }
@@ -122,9 +146,6 @@ object FirebaseHelper {
         return listener
     }
 
-    /**
-     * Mendengarkan percakapan antara dua pengguna tertentu di Firebase secara Real-Time.
-     */
     fun listenForConversation(
         context: Context,
         currentUserId: String,
@@ -144,18 +165,15 @@ object FirebaseHelper {
                         ) {
                             conversation.add(message)
                         }
-                        // Cek Notifikasi Pesan Masuk
                         checkAndShowNotification(context, currentUserId, message, preferenceManager)
                     }
                 }
                 isInitialLoad = false
                 conversation.sortBy { it.timestamp }
-                Log.d(TAG, "Realtime Conversation updated: ${conversation.size} messages")
                 onMessagesUpdated(conversation)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Firebase listenForConversation Cancelled/Error: ${error.message} (Code: ${error.code})")
                 if (error.code == DatabaseError.PERMISSION_DENIED) {
                     showToastOnUI(context, "Firebase Error: Permission Denied! Ubah Rules di Firebase Console ke true.")
                 }
@@ -166,9 +184,6 @@ object FirebaseHelper {
         return listener
     }
 
-    /**
-     * Mendengarkan daftar percakapan terbaru (Recent Conversations) secara Real-Time & Pemicu Notifikasi.
-     */
     fun listenForRecentConversations(
         context: Context,
         currentUserId: String,
@@ -181,18 +196,15 @@ object FirebaseHelper {
                     val message = child.getValue(ChatMessage::class.java)
                     if (message != null) {
                         preferenceManager.saveChatMessage(message)
-                        // Cek Notifikasi Pesan Masuk Otomatis
                         checkAndShowNotification(context, currentUserId, message, preferenceManager)
                     }
                 }
                 isInitialLoad = false
                 val recent = preferenceManager.getRecentConversations(currentUserId)
-                Log.d(TAG, "Realtime Recent Conversations updated: ${recent.size} items")
                 onRecentUpdated(recent)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Firebase listenForRecentConversations Cancelled/Error: ${error.message} (Code: ${error.code})")
                 if (error.code == DatabaseError.PERMISSION_DENIED) {
                     showToastOnUI(context, "Firebase Error: Permission Denied! Ubah Rules di Firebase Console ke true.")
                 }
@@ -203,21 +215,16 @@ object FirebaseHelper {
         return listener
     }
 
-    /**
-     * Memeriksa dan memicu Heads-Up Notification jika ada pesan baru masuk dari pengguna lain.
-     */
     private fun checkAndShowNotification(
         context: Context,
         currentUserId: String,
         message: ChatMessage,
         preferenceManager: PreferenceManager
     ) {
-        // Hanya picu jika pesan ditujukan ke akun aktif saat ini, dikirim oleh akun lain, dan bukan saat awal memuat data
         if (message.receiverId == currentUserId && message.senderId != currentUserId) {
             if (!notifiedMessageIds.contains(message.id)) {
                 notifiedMessageIds.add(message.id)
                 if (!isInitialLoad) {
-                    // Jangan tampilkan notifikasi jika obrolan dengan pengirim sedang dibuka di layar
                     if (currentActiveChatReceiverId == message.senderId) {
                         return
                     }
@@ -238,14 +245,15 @@ object FirebaseHelper {
         }
     }
 
-    /**
-     * Melepas listener Firebase ketika Activity dihancurkan.
-     */
     fun removeUsersListener(listener: ValueEventListener) {
         database.reference.child(PATH_USERS).removeEventListener(listener)
     }
 
     fun removeChatsListener(listener: ValueEventListener) {
         database.reference.child(PATH_CHATS).removeEventListener(listener)
+    }
+
+    fun removeContactsListener(currentUserId: String, listener: ValueEventListener) {
+        database.reference.child(PATH_CONTACTS).child(currentUserId).removeEventListener(listener)
     }
 }
