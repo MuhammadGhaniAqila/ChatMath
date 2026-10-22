@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_dialog_white"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/textFormulaTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Atur Rumus Fungsi f(x) &amp; g(x)"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textFormulaSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Ubah koefisien fungsi linear untuk enkripsi Mode Hybrid:"
+        android:textColor="#4B5563"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textFormulaTitle" />
+
+    <LinearLayout
+        android:id="@+id/layoutInputs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/textFormulaSubtitle">
+
+        <!-- Input Fungsi 1: f(x) = a*x + b -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fungsi 1 : f(x) = a*x + b"
+            android:textColor="@color/primary_text"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/inputCoeffA"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/background_input"
+                android:hint="Pengali a (≠0)"
+                android:importantForAutofill="no"
+                android:inputType="numberSigned"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/primary_text"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/inputConstB"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/background_input"
+                android:hint="Konstanta b"
+                android:importantForAutofill="no"
+                android:inputType="numberSigned"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/primary_text"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <!-- Input Fungsi 2: g(x) = c*x + d -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Fungsi 2 : g(x) = c*x + d"
+            android:textColor="@color/primary_text"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/inputCoeffC"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/background_input"
+                android:hint="Pengali c (≠0)"
+                android:importantForAutofill="no"
+                android:inputType="numberSigned"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/primary_text"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/inputConstD"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/background_input"
+                android:hint="Konstanta d"
+                android:importantForAutofill="no"
+                android:inputType="numberSigned"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/primary_text"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Preview Box Komposisi -->
+    <TextView
+        android:id="@+id/textPreviewComposition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/background_formula_box"
+        android:padding="10dp"
+        android:textColor="#1F2937"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        app:layout_constraintTop_toBottomOf="@id/layoutInputs" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/textPreviewComposition">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonSaveManual"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:backgroundTint="@color/primary"
+            android:text="Simpan Rumus Manual"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonRandomize"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:text="Acak Otomatis"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                app:strokeColor="@color/primary" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonCancel"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="Batal"
+                android:textColor="@color/secondary_text"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                app:strokeColor="#D1D5DB" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
