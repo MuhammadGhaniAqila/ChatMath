@@ -7,18 +7,21 @@
     <string name="create_account">Buat Akun Baru</string>
     <string name="sign_up">Daftar</string>
     <string name="add_image">Tambah Foto</string>
-    <string name="name_hint">Nama</string>
-    <string name="email_hint">Email</string>
+    <string name="name_hint">Nama Pengguna</string>
+    <string name="phone_hint">Nomor Handphone (misal: 0811111111)</string>
+    <string name="email_hint">Email Google (misal: siswa1@gmail.com)</string>
+    <string name="email_or_phone_hint">Email Google atau Nomor Handphone</string>
     <string name="password_hint">Kata Sandi</string>
     <string name="confirm_password_hint">Konfirmasi Kata Sandi</string>
     <string name="recent_conversations">Percakapan Terbaru</string>
     <string name="no_conversations">Belum ada percakapan.\nTekan (+) untuk memilih teman.</string>
-    <string name="no_other_users">Belum ada pengguna lain terdaftar.</string>
-    <string name="select_user">Pilih Teman</string>
+    <string name="no_other_users">Belum ada kontak tersimpan.</string>
+    <string name="select_user">Kontak &amp; Teman Favorit</string>
     <string name="type_message">Tulis pesan rahasia...</string>
     <string name="tap_for_details">Ketuk untuk rincian rumus</string>
     <string name="example_button">Contoh</string>
     <string name="formula_info_button">Info Rumus</string>
+    <string name="button_google_signin">Masuk Cepat dengan Akun Google</string>
 
     <string name="menu_profile">Profil</string>
     <string name="menu_change_language">Ubah Bahasa</string>

@@ -42,15 +42,33 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageBack">
 
+        <!-- Tombol Simpan Nomor / Kontak Baru -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonAddContact"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/primary"
+            android:text="+ Simpan Nomor / Kontak Baru"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="10dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/usersRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonAddContact" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -68,6 +86,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:text="@string/no_other_users"
+            android:textAlignment="center"
             android:textColor="@color/secondary_text"
             android:textSize="14sp"
             android:visibility="gone"
