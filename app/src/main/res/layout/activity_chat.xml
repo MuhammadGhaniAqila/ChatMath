@@ -21,9 +21,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageProfile"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:id="@+id/imagePartnerProfile"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:layout_marginStart="8dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_person"
@@ -32,42 +32,52 @@
         app:layout_constraintTop_toTopOf="@id/imageBack"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
-    <TextView
-        android:id="@+id/textName"
+    <LinearLayout
+        android:id="@+id/layoutPartnerInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="6dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:textStyle="bold"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@id/imageBack"
-        app:layout_constraintEnd_toStartOf="@id/buttonExample"
-        app:layout_constraintStart_toEndOf="@id/imageProfile"
-        app:layout_constraintTop_toTopOf="@id/imageBack" />
+        app:layout_constraintEnd_toStartOf="@id/imageFavoriteToggle"
+        app:layout_constraintStart_toEndOf="@id/imagePartnerProfile"
+        app:layout_constraintTop_toTopOf="@id/imageBack">
 
-    <!-- Shortcut Button "Contoh" ("Telkom Purwokerto") -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/buttonExample"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="wrap_content"
-        android:layout_height="34dp"
-        android:layout_marginEnd="6dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/example_button"
-        android:textColor="@color/white"
-        android:textSize="11sp"
-        app:strokeColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@id/imageBack"
-        app:layout_constraintEnd_toStartOf="@id/imageFormula"
-        app:layout_constraintTop_toTopOf="@id/imageBack" />
+        <TextView
+            android:id="@+id/textName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
-    <!-- Button "Info Rumus" -->
+        <TextView
+            android:id="@+id/textFormulaStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#FFCDD2"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageFormula"
+        android:id="@+id/imageFavoriteToggle"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="6dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_star_outline"
+        app:layout_constraintBottom_toBottomOf="@id/imageBack"
+        app:layout_constraintEnd_toStartOf="@id/imageChatFormulaInfo"
+        app:layout_constraintTop_toTopOf="@id/imageBack" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageChatFormulaInfo"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginEnd="12dp"
@@ -79,7 +89,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/imageBack" />
 
-    <!-- Chat Area -->
+    <!-- Chat Content Area -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -96,7 +106,7 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/background_formula_box"
+            android:background="@drawable/background_input"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
@@ -165,7 +175,7 @@
                 android:layout_width="46dp"
                 android:layout_height="46dp"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/background_button">
+                android:background="@drawable/background_button_primary">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="22dp"

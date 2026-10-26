@@ -2,26 +2,31 @@
 <resources>
     <string name="app_name">ChatMath</string>
     <string name="welcome_title">Welcome to ChatMath</string>
-    <string name="welcome_subtitle">Sign in to continue — SMK Telkom Purwokerto</string>
+    <string name="welcome_subtitle">Sign in to start sending encrypted messages</string>
     <string name="sign_in">Sign In</string>
     <string name="create_account">Create New Account</string>
     <string name="sign_up">Sign Up</string>
-    <string name="add_image">Add Image</string>
-    <string name="name_hint">Username</string>
-    <string name="phone_hint">Phone Number (e.g. 0811111111)</string>
-    <string name="email_hint">Google Email (e.g. student1@gmail.com)</string>
-    <string name="email_or_phone_hint">Google Email or Phone Number</string>
+    <string name="add_image">Select Photo</string>
+    <string name="name_hint">Full Name</string>
+    <string name="phone_hint">Phone Number</string>
+    <string name="email_hint">Email Address</string>
+    <string name="email_or_phone_hint">Email or Phone Number</string>
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="recent_conversations">Recent Conversations</string>
     <string name="no_conversations">No conversations yet.\nTap (+) to choose a friend.</string>
     <string name="no_other_users">No saved contacts yet.</string>
     <string name="select_user">Contacts &amp; Favorites</string>
-    <string name="type_message">Type a secret message...</string>
+    <string name="type_message">Type a message...</string>
     <string name="tap_for_details">Tap for formula details</string>
     <string name="example_button">Example</string>
     <string name="formula_info_button">Formula Info</string>
-    <string name="button_google_signin">Quick Sign In with Google</string>
+
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="signin_with_phone_otp">Sign in with Phone (OTP)</string>
+    <string name="or_signin_with">or sign in using</string>
+    <string name="dont_have_account_signup">Don\'t have an account? Sign Up now</string>
+    <string name="already_have_account_signin">Already have an account? Sign In</string>
 
     <string name="menu_profile">Profile</string>
     <string name="menu_change_language">Change Language</string>
@@ -38,6 +43,6 @@
     <string name="button_sign_out">Sign Out Account</string>
     <string name="profile_updated_success">Profile updated successfully!</string>
     <string name="sign_out_confirmation">Are you sure you want to sign out from this account?</string>
-    <string name="yes">Yes</string>
-    <string name="cancel">Cancel</string>
+    <string name="yes">Ya</string>
+    <string name="cancel">Batal</string>
 </resources>

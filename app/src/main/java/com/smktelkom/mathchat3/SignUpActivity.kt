@@ -84,38 +84,31 @@ class SignUpActivity : AppCompatActivity() {
     private fun signUp() {
         loading(true)
         val name = binding.inputName.text.toString().trim()
-        val phone = binding.inputPhone.text.toString().trim()
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString().trim()
 
-        // Cek terlebih dahulu di database users apakah Email atau No HP tersebut sudah pernah terdaftar
-        if (preferenceManager.findUserByEmailOrPhone(email) != null || (phone.isNotEmpty() && preferenceManager.findUserByEmailOrPhone(phone) != null)) {
+        if (preferenceManager.findUserByEmail(email) != null) {
             loading(false)
-            showToast("Akun atau Nomor HP sudah terdaftar, silakan langsung Sign In!")
+            showToast("Akun sudah terdaftar, silakan langsung Sign In!")
             return
         }
 
-        // Jika foto dari galeri tidak dipilih, buatkan Avatar bulat otomatis dari inisial nama
         val finalImageBase64 = encodedImage ?: AvatarGenerator.generateAvatarBase64(name)
 
         val user = User(
             id = UUID.randomUUID().toString(),
             name = name,
-            phoneNumber = phone,
             email = email,
             password = password,
             imageBase64 = finalImageBase64
         )
 
-        // Simpan Permanen ke ChatMathDatabase & Firebase
         preferenceManager.saveUser(user)
         FirebaseHelper.saveUser(user)
 
-        // Aktifkan Sesi Login di ChatMathSession
         preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
         preferenceManager.putString(PreferenceManager.KEY_USER_ID, user.id)
         preferenceManager.putString(PreferenceManager.KEY_NAME, user.name)
-        preferenceManager.putString(PreferenceManager.KEY_PHONE, user.phoneNumber)
         preferenceManager.putString(PreferenceManager.KEY_EMAIL, user.email)
         preferenceManager.putString(PreferenceManager.KEY_IMAGE, user.imageBase64)
 
@@ -165,7 +158,7 @@ class SignUpActivity : AppCompatActivity() {
                 showToast("Password dan Konfirmasi Password harus sama")
                 false
             }
-            preferenceManager.findUserByEmailOrPhone(binding.inputEmail.text.toString().trim()) != null -> {
+            preferenceManager.findUserByEmail(binding.inputEmail.text.toString().trim()) != null -> {
                 showToast("Akun sudah terdaftar, silakan langsung Sign In!")
                 false
             }

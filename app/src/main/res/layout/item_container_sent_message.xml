@@ -22,7 +22,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Plainteks Terbaca -->
         <TextView
             android:id="@+id/textMessage"
             android:layout_width="wrap_content"
@@ -31,25 +30,22 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-        <!-- Label Rumus Pesan Ini -->
         <TextView
-            android:id="@+id/textFormulaLabel"
+            android:id="@+id/textFormulaUsed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textColor="#FFE4E4"
             android:textSize="11sp" />
 
-        <!-- Baris Cipherteks -->
         <TextView
-            android:id="@+id/textCipher"
+            android:id="@+id/textCipherPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textColor="#FFD1D1"
             android:textSize="12sp" />
 
-        <!-- Hint Rincian Rumus -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

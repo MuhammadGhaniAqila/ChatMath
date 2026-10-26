@@ -10,7 +10,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.database.ValueEventListener
 import com.smktelkom.mathchat3.databinding.ActivitySignInBinding
-import com.smktelkom.mathchat3.utils.DialogHelper
 import com.smktelkom.mathchat3.utils.FirebaseHelper
 import com.smktelkom.mathchat3.utils.LocaleHelper
 import com.smktelkom.mathchat3.utils.PreferenceManager
@@ -68,33 +67,24 @@ class SignInActivity : AppCompatActivity() {
         }
 
         binding.buttonGoogleSignIn.setOnClickListener {
-            DialogHelper.showGoogleSignInDialog(this, preferenceManager) { selectedUser ->
-                preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
-                preferenceManager.putString(PreferenceManager.KEY_USER_ID, selectedUser.id)
-                preferenceManager.putString(PreferenceManager.KEY_NAME, selectedUser.name)
-                preferenceManager.putString(PreferenceManager.KEY_PHONE, selectedUser.phoneNumber)
-                preferenceManager.putString(PreferenceManager.KEY_EMAIL, selectedUser.email)
-                preferenceManager.putString(PreferenceManager.KEY_IMAGE, selectedUser.imageBase64)
+            showToast("Fitur Login Google siap disambungkan ke Firebase Auth!")
+        }
 
-                showToast("Sign In Berhasil")
-                val intent = Intent(applicationContext, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(intent)
-            }
+        binding.buttonPhoneOtpSignIn.setOnClickListener {
+            showToast("Fitur Login Nomor HP (OTP) siap disambungkan ke Firebase Auth!")
         }
     }
 
     private fun signIn() {
         loading(true)
-        val query = binding.inputEmail.text.toString().trim()
+        val emailOrPhone = binding.inputEmailOrPhone.text.toString().trim()
         val password = binding.inputPassword.text.toString().trim()
 
-        val user = preferenceManager.findUserByEmailOrPhone(query)
+        val user = preferenceManager.findUserByEmail(emailOrPhone)
         if (user != null && user.password == password) {
             preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
             preferenceManager.putString(PreferenceManager.KEY_USER_ID, user.id)
             preferenceManager.putString(PreferenceManager.KEY_NAME, user.name)
-            preferenceManager.putString(PreferenceManager.KEY_PHONE, user.phoneNumber)
             preferenceManager.putString(PreferenceManager.KEY_EMAIL, user.email)
             preferenceManager.putString(PreferenceManager.KEY_IMAGE, user.imageBase64)
 
@@ -104,7 +94,7 @@ class SignInActivity : AppCompatActivity() {
             startActivity(intent)
         } else {
             loading(false)
-            showToast("Email/Username atau Password salah, atau akun belum terdaftar!")
+            showToast("Email/No HP atau Password salah, atau akun belum terdaftar!")
         }
     }
 
@@ -124,8 +114,8 @@ class SignInActivity : AppCompatActivity() {
 
     private fun isValidSignInDetails(): Boolean {
         return when {
-            binding.inputEmail.text.toString().trim().isEmpty() -> {
-                showToast("Masukkan Email Google atau Nomor HP")
+            binding.inputEmailOrPhone.text.toString().trim().isEmpty() -> {
+                showToast("Masukkan Email atau Nomor Handphone")
                 false
             }
             binding.inputPassword.text.toString().trim().isEmpty() -> {

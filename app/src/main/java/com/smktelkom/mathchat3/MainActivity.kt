@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var preferenceManager: PreferenceManager
     private var chatsListener: ValueEventListener? = null
-    private var isFilterFavoritesOnly = false
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -114,16 +113,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setListeners() {
-        binding.chipAllChats.setOnClickListener {
-            isFilterFavoritesOnly = false
-            listenForRecentConversations()
-        }
-
-        binding.chipFavoriteChats.setOnClickListener {
-            isFilterFavoritesOnly = true
-            listenForRecentConversations()
-        }
-
         binding.imageFormula.setOnClickListener {
             showFormulaConfigDialog()
         }
@@ -178,24 +167,13 @@ class MainActivity : AppCompatActivity() {
             this,
             currentUserId,
             preferenceManager
-        ) { allRecentConversations ->
+        ) { recentConversations ->
             binding.progressBar.visibility = View.GONE
             val allUsers = preferenceManager.getAllUsers()
-            val savedContacts = preferenceManager.getSavedContacts(currentUserId)
-            val favUserIds = savedContacts.filter { it.isFavorite }.map { it.contactUserId }.toSet()
 
-            val displayList = if (isFilterFavoritesOnly) {
-                allRecentConversations.filter { message ->
-                    val otherUserId = if (message.senderId == currentUserId) message.receiverId else message.senderId
-                    favUserIds.contains(otherUserId)
-                }
-            } else {
-                allRecentConversations
-            }
-
-            if (displayList.isNotEmpty()) {
+            if (recentConversations.isNotEmpty()) {
                 val adapter = RecentConversationsAdapter(
-                    displayList,
+                    recentConversations,
                     currentUserId,
                     allUsers
                 ) { selectedUser ->

@@ -35,7 +35,6 @@
         app:layout_constraintStart_toEndOf="@id/imageProfile"
         app:layout_constraintTop_toTopOf="@id/imageProfile" />
 
-    <!-- Button Info Rumus -->
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageFormula"
         android:layout_width="36dp"
@@ -49,7 +48,6 @@
         app:layout_constraintEnd_toStartOf="@id/imageMore"
         app:layout_constraintTop_toTopOf="@id/imageProfile" />
 
-    <!-- Three Dots Menu Button -->
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageMore"
         android:layout_width="36dp"
@@ -63,7 +61,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/imageProfile" />
 
-    <!-- Recent Conversations Card -->
+    <!-- Curved Bottom White Container -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -72,15 +70,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageProfile">
 
-        <!-- Banner Rumus Aktif -->
+        <!-- Banner Info Rumus Aktif -->
         <TextView
             android:id="@+id/textFormulaBanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="14dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/background_formula_box"
+            android:background="@drawable/background_input"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
@@ -102,7 +100,7 @@
             app:layout_constraintTop_toBottomOf="@id/textFormulaBanner">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/chipAllChats"
+                android:id="@+id/tabAllChats"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
@@ -115,7 +113,7 @@
                 app:cornerRadius="18dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/chipFavoriteChats"
+                android:id="@+id/tabFavoriteChats"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
@@ -125,7 +123,7 @@
                 android:textColor="@color/secondary_text"
                 android:textSize="12sp"
                 app:cornerRadius="18dp"
-                app:strokeColor="#D1D5DB" />
+                app:strokeColor="@color/google_btn_stroke" />
 
         </LinearLayout>
 

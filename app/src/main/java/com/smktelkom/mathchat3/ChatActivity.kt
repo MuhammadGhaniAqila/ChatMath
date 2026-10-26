@@ -88,11 +88,13 @@ class ChatActivity : AppCompatActivity() {
         if (receiverProfileBitmap == null) {
             receiverProfileBitmap = AvatarGenerator.generateAvatarBitmap(receiverUser.name)
         }
-        binding.imageProfile.setImageBitmap(receiverProfileBitmap)
+        binding.imagePartnerProfile.setImageBitmap(receiverProfileBitmap)
     }
 
     private fun updateFormulaBanner() {
-        binding.textFormulaBanner.text = FormulaManager.getFormulaBannerText(this) + "  [Ubah Rumus]"
+        val bannerText = FormulaManager.getFormulaBannerText(this)
+        binding.textFormulaBanner.text = "$bannerText  [Ubah Rumus]"
+        binding.textFormulaStatus.text = bannerText
     }
 
     private fun setListeners() {
@@ -100,13 +102,7 @@ class ChatActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.buttonExample.setOnClickListener {
-            // Tombol pintasan untuk mengisi otomatis "Telkom Purwokerto"
-            binding.inputMessage.setText("Telkom Purwokerto")
-            binding.inputMessage.setSelection(binding.inputMessage.text.length)
-        }
-
-        binding.imageFormula.setOnClickListener {
+        binding.imageChatFormulaInfo.setOnClickListener {
             showFormulaConfigDialog()
         }
 
@@ -138,16 +134,13 @@ class ChatActivity : AppCompatActivity() {
         val plaintext = binding.inputMessage.text.toString().trim()
         if (plaintext.isEmpty()) return
 
-        // Validasi Karakter: Harus huruf A-Z, a-z, atau spasi
         if (!CryptoHelper.isValidText(plaintext)) {
             showToast("Gunakan huruf A-Z, a-z, atau spasi saja!")
             return
         }
 
-        // Ambil rumus aktif saat pesan ini dikirim untuk dikunci di ChatMessage
         val formula = FormulaManager.getActiveFormula(this)
 
-        // Proses Enkripsi Dinamis
         val ciphertext = CryptoHelper.encrypt(plaintext, formula.a, formula.b, formula.c, formula.d)
         val message = ChatMessage(
             senderId = currentUserId,
@@ -164,7 +157,6 @@ class ChatActivity : AppCompatActivity() {
             timestamp = System.currentTimeMillis()
         )
 
-        // Simpan Lokal & Kirim ke Firebase Realtime Database
         preferenceManager.saveChatMessage(message)
         FirebaseHelper.saveChatMessage(message)
 

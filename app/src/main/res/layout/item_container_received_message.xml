@@ -12,9 +12,9 @@
         android:layout_height="32dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_person"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
         app:layout_constraintBottom_toBottomOf="@id/layoutMessageBubble"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
     <LinearLayout
         android:id="@+id/layoutMessageBubble"
@@ -33,7 +33,6 @@
         app:layout_constraintStart_toEndOf="@id/imageProfile"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Plainteks Terbaca -->
         <TextView
             android:id="@+id/textMessage"
             android:layout_width="wrap_content"
@@ -42,25 +41,22 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-        <!-- Label Rumus Pesan Ini -->
         <TextView
-            android:id="@+id/textFormulaLabel"
+            android:id="@+id/textFormulaUsed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textColor="#CBD5E1"
             android:textSize="11sp" />
 
-        <!-- Baris Cipherteks -->
         <TextView
-            android:id="@+id/textCipher"
+            android:id="@+id/textCipherPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textColor="#A0AEC0"
             android:textSize="12sp" />
 
-        <!-- Hint Rincian Rumus -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

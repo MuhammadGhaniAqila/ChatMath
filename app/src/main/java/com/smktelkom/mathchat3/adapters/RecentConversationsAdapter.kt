@@ -25,7 +25,7 @@ class RecentConversationsAdapter(
 
             binding.textName.text = otherUserName
             binding.textRecentMessage.text = message.plaintext
-            binding.textDateTime.text = message.dateTime
+            binding.textTime.text = message.dateTime
 
             val imageBase64 = otherUser?.imageBase64 ?: ""
             if (imageBase64.isNotEmpty()) {

@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ChatMath</string>
-    <string name="welcome_title">Selamat Datang di ChatMath</string>
-    <string name="welcome_subtitle">Masuk untuk melanjutkan — SMK Telkom Purwokerto</string>
-    <string name="sign_in">Masuk</string>
-    <string name="create_account">Buat Akun Baru</string>
-    <string name="sign_up">Daftar</string>
-    <string name="add_image">Tambah Foto</string>
-    <string name="name_hint">Nama Pengguna</string>
-    <string name="phone_hint">Nomor Handphone (misal: 0811111111)</string>
-    <string name="email_hint">Email Google (misal: siswa1@gmail.com)</string>
-    <string name="email_or_phone_hint">Email Google atau Nomor Handphone</string>
-    <string name="password_hint">Kata Sandi</string>
-    <string name="confirm_password_hint">Konfirmasi Kata Sandi</string>
+    <string name="welcome_title">Welcome to ChatMath</string>
+    <string name="welcome_subtitle">Masuk untuk mulai mengirim pesan terenkripsi</string>
+    <string name="sign_in">Sign In</string>
+    <string name="create_account">Create New Account</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="add_image">Pilih Foto</string>
+    <string name="name_hint">Nama Lengkap</string>
+    <string name="phone_hint">Nomor Handphone</string>
+    <string name="email_hint">Alamat Email</string>
+    <string name="email_or_phone_hint">Email atau Nomor Handphone</string>
+    <string name="password_hint">Password</string>
+    <string name="confirm_password_hint">Konfirmasi Password</string>
     <string name="recent_conversations">Percakapan Terbaru</string>
     <string name="no_conversations">Belum ada percakapan.\nTekan (+) untuk memilih teman.</string>
     <string name="no_other_users">Belum ada kontak tersimpan.</string>
     <string name="select_user">Kontak &amp; Teman Favorit</string>
-    <string name="type_message">Tulis pesan rahasia...</string>
+    <string name="type_message">Ketik pesan...</string>
     <string name="tap_for_details">Ketuk untuk rincian rumus</string>
     <string name="example_button">Contoh</string>
     <string name="formula_info_button">Info Rumus</string>
-    <string name="button_google_signin">Masuk Cepat dengan Akun Google</string>
+
+    <string name="continue_with_google">Lanjutkan dengan Google</string>
+    <string name="signin_with_phone_otp">Masuk dengan Nomor HP (OTP)</string>
+    <string name="or_signin_with">atau masuk menggunakan</string>
+    <string name="dont_have_account_signup">Belum punya akun? Daftar Sekarang (Sign Up)</string>
+    <string name="already_have_account_signin">Sudah punya akun? Sign In</string>
 
     <string name="menu_profile">Profil</string>
     <string name="menu_change_language">Ubah Bahasa</string>

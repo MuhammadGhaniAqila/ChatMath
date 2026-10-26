@@ -17,57 +17,29 @@
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
-    <LinearLayout
-        android:id="@+id/layoutName"
+    <TextView
+        android:id="@+id/textName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:textColor="@color/primary_text"
+        android:textSize="15sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/imageFavoriteStar"
         app:layout_constraintStart_toEndOf="@id/imageProfile"
-        app:layout_constraintTop_toTopOf="@id/imageProfile">
-
-        <TextView
-            android:id="@+id/textName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/primary_text"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/textFavoriteBadge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/background_formula_box"
-            android:backgroundTint="#FEF3C7"
-            android:paddingStart="6dp"
-            android:paddingTop="2dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="2dp"
-            android:text="★ FAVORIT"
-            android:textColor="#D97706"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="@id/imageProfile" />
 
     <TextView
-        android:id="@+id/textDetails"
+        android:id="@+id/textPhoneOrEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:textColor="@color/secondary_text"
         android:textSize="13sp"
         app:layout_constraintEnd_toStartOf="@id/imageFavoriteStar"
-        app:layout_constraintStart_toStartOf="@id/layoutName"
-        app:layout_constraintTop_toBottomOf="@id/layoutName" />
+        app:layout_constraintStart_toStartOf="@id/textName"
+        app:layout_constraintTop_toBottomOf="@id/textName" />
 
     <ImageView
         android:id="@+id/imageFavoriteStar"
