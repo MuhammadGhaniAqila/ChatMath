@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -30,7 +29,6 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.ValueEventListener
 import com.smktelkom.mathchat3.databinding.ActivitySignInBinding
-import com.smktelkom.mathchat3.databinding.DialogGoogleSigninBinding
 import com.smktelkom.mathchat3.databinding.DialogPhoneOtpBinding
 import com.smktelkom.mathchat3.models.User
 import com.smktelkom.mathchat3.utils.AvatarGenerator
@@ -51,22 +49,20 @@ class SignInActivity : AppCompatActivity() {
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             val account = task.getResult(ApiException::class.java)
             if (account != null) {
                 handleGoogleSignInSuccess(account)
             } else {
                 loading(false)
-                showGoogleAccountFallbackDialog()
+                showToast("Gagal memilih akun Google.")
             }
         } catch (e: ApiException) {
             Log.w("SignInActivity", "GoogleSignIn ApiException code=${e.statusCode}: ${e.message}")
             loading(false)
-            // Jika SHA-1 belum didaftarkan di Firebase Console (code 10 / 12500) atau dibatalkan,
-            // tampilkan dialog pilih/masukkan akun Google agar login tetap berjalan lancar
             if (e.statusCode != 12501) { // 12501 = SIGN_IN_CANCELLED
-                showGoogleAccountFallbackDialog()
+                showToast("Gagal memilih akun Google (Code: ${e.statusCode})")
             }
         }
     }
@@ -112,13 +108,16 @@ class SignInActivity : AppCompatActivity() {
             .requestEmail()
             .requestProfile()
 
-        // Cek apakah default_web_client_id sudah ter-generate dari google-services.json
-        val webClientIdResId = resources.getIdentifier("default_web_client_id", "string", packageName)
-        if (webClientIdResId != 0) {
-            val webClientId = getString(webClientIdResId)
-            if (webClientId.isNotBlank()) {
-                gsoBuilder.requestIdToken(webClientId)
+        try {
+            val webClientIdResId = resources.getIdentifier("default_web_client_id", "string", packageName)
+            if (webClientIdResId != 0) {
+                val webClientId = getString(webClientIdResId)
+                if (webClientId.isNotBlank()) {
+                    gsoBuilder.requestIdToken(webClientId)
+                }
             }
+        } catch (e: Exception) {
+            Log.e("SignInActivity", "Error setting request ID Token: ${e.message}")
         }
 
         googleSignInClient = GoogleSignIn.getClient(this, gsoBuilder.build())
@@ -205,7 +204,7 @@ class SignInActivity : AppCompatActivity() {
 
     private fun handleGoogleSignInSuccess(account: GoogleSignInAccount) {
         val email = account.email ?: ""
-        val displayName = account.displayName?.takeIf { it.isNotBlank() }
+        val name = account.displayName?.takeIf { it.isNotBlank() }
             ?: email.substringBefore("@").ifEmpty { "Pengguna Google" }
         val idToken = account.idToken
 
@@ -213,117 +212,20 @@ class SignInActivity : AppCompatActivity() {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             firebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
-                    loading(false)
                     val uid = if (task.isSuccessful) {
-                        task.result?.user?.uid ?: account.id ?: UUID.randomUUID().toString()
+                        task.result?.user?.uid ?: account.id ?: email
                     } else {
-                        account.id ?: UUID.randomUUID().toString()
+                        account.id ?: email
                     }
-                    finalizeGoogleUserLogin(uid, displayName, email, "")
+                    finalizeGoogleUserLogin(uid, name, email)
                 }
         } else {
-            loading(false)
-            val uid = account.id ?: UUID.randomUUID().toString()
-            finalizeGoogleUserLogin(uid, displayName, email, "")
+            val uid = account.id ?: email
+            finalizeGoogleUserLogin(uid, name, email)
         }
     }
 
-    private fun showGoogleAccountFallbackDialog() {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        val dialogBinding = DialogGoogleSigninBinding.inflate(LayoutInflater.from(this))
-        dialog.setContentView(dialogBinding.root)
-
-        dialog.window?.let { window ->
-            val width = (resources.displayMetrics.widthPixels * 0.90).toInt()
-            window.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
-            window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
-
-        val existingUsers = preferenceManager.getAllUsers()
-        val radioGroup = dialogBinding.radioGroupGoogleAccounts
-        var newAccountRadioId = View.generateViewId()
-
-        existingUsers.forEachIndexed { index, user ->
-            val rb = RadioButton(this).apply {
-                id = View.generateViewId()
-                text = "${user.name} (${user.email.ifEmpty { user.phone }})"
-                textSize = 13f
-                setPadding(12, 12, 12, 12)
-                tag = user
-            }
-            radioGroup.addView(rb)
-            if (index == 0) {
-                rb.isChecked = true
-            }
-        }
-
-        val rbNew = RadioButton(this).apply {
-            id = newAccountRadioId
-            text = "+ Gunakan Akun Google (@gmail.com) Baru"
-            textSize = 13f
-            setPadding(12, 12, 12, 12)
-        }
-        radioGroup.addView(rbNew)
-
-        if (existingUsers.isEmpty()) {
-            rbNew.isChecked = true
-            dialogBinding.layoutNewAccountInputs.visibility = View.VISIBLE
-        }
-
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-            dialogBinding.layoutNewAccountInputs.visibility =
-                if (checkedId == newAccountRadioId) View.VISIBLE else View.GONE
-        }
-
-        dialogBinding.buttonGoogleCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialogBinding.buttonGoogleProceed.setOnClickListener {
-            val checkedId = radioGroup.checkedRadioButtonId
-            if (checkedId == newAccountRadioId) {
-                val rawName = dialogBinding.inputNewName.text.toString().trim()
-                val rawEmail = dialogBinding.inputNewEmail.text.toString().trim()
-                val rawPhone = dialogBinding.inputNewPhone.text.toString().trim()
-
-                if (rawEmail.isEmpty() || !rawEmail.contains("@")) {
-                    showToast("Masukkan alamat email Google yang valid (misal: nama@gmail.com)")
-                    return@setOnClickListener
-                }
-                val finalName = rawName.ifEmpty {
-                    rawEmail.substringBefore("@").replaceFirstChar { it.uppercase() }
-                }
-                val normPhone = PreferenceManager.normalizePhone(rawPhone)
-
-                dialog.dismiss()
-                loading(true)
-
-                // Daftarkan/autentikasi ke Firebase Auth lalu simpan ke Realtime Database
-                firebaseAuth.createUserWithEmailAndPassword(rawEmail, "google_auth_default")
-                    .addOnCompleteListener { createTask ->
-                        val uid = if (createTask.isSuccessful) {
-                            createTask.result?.user?.uid ?: "google_${rawEmail.hashCode()}"
-                        } else {
-                            "google_${rawEmail.hashCode()}"
-                        }
-                        loading(false)
-                        finalizeGoogleUserLogin(uid, finalName, rawEmail, normPhone)
-                    }
-            } else {
-                val selectedRb = radioGroup.findViewById<RadioButton>(checkedId)
-                val selectedUser = selectedRb?.tag as? User
-                if (selectedUser != null) {
-                    dialog.dismiss()
-                    completeSessionAndNavigate(selectedUser, "Masuk sebagai ${selectedUser.name}")
-                }
-            }
-        }
-
-        dialog.show()
-    }
-
-    private fun finalizeGoogleUserLogin(uid: String, name: String, email: String, phone: String) {
+    private fun finalizeGoogleUserLogin(uid: String, name: String, email: String) {
         val existingUser = if (email.isNotEmpty()) {
             preferenceManager.findUserByEmail(email)
         } else {
@@ -333,7 +235,7 @@ class SignInActivity : AppCompatActivity() {
         val user = if (existingUser != null) {
             existingUser.copy(
                 name = existingUser.name.ifEmpty { name },
-                phone = existingUser.phone.ifEmpty { phone }
+                id = existingUser.id.ifEmpty { uid }
             )
         } else {
             User(
@@ -342,13 +244,26 @@ class SignInActivity : AppCompatActivity() {
                 email = email,
                 password = "google_oauth_login",
                 imageBase64 = AvatarGenerator.generateAvatarBase64(name),
-                phone = phone
+                phone = ""
             )
         }
 
         preferenceManager.saveUser(user)
         FirebaseHelper.saveUser(user)
-        completeSessionAndNavigate(user, "Login Google Berhasil: ${user.name}")
+
+        preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
+        preferenceManager.putString(PreferenceManager.KEY_USER_ID, user.id)
+        preferenceManager.putString(PreferenceManager.KEY_NAME, user.name)
+        preferenceManager.putString(PreferenceManager.KEY_EMAIL, user.email)
+        preferenceManager.putString(PreferenceManager.KEY_IMAGE, user.imageBase64)
+        preferenceManager.putString(PreferenceManager.KEY_PHONE, user.phone)
+
+        loading(false)
+        showToast("Login Google Berhasil: ${user.name}")
+        val intent = Intent(applicationContext, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+        finish()
     }
 
     // =========================================================================
@@ -410,8 +325,6 @@ class SignInActivity : AppCompatActivity() {
                         otpBinding.progressOtp.visibility = View.GONE
                         otpBinding.buttonOtpAction.isEnabled = true
 
-                        // Jika Firebase Console belum mengaktifkan Phone Auth / kuota SMS Spark,
-                        // sediakan kode OTP verifikasi agar alur OTP tetap bisa digunakan di perangkat
                         isOtpStep = true
                         fallbackGeneratedOtp = (100000..999999).random().toString()
                         otpBinding.layoutPhoneInputSection.visibility = View.GONE
