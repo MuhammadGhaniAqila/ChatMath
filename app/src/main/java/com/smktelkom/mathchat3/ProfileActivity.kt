@@ -11,6 +11,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.smktelkom.mathchat3.databinding.ActivityProfileBinding
 import com.smktelkom.mathchat3.models.User
 import com.smktelkom.mathchat3.utils.AvatarGenerator
@@ -27,6 +30,7 @@ class ProfileActivity : AppCompatActivity() {
     private var encodedImage: String? = null
     private var currentUserId: String = ""
     private var currentUserEmail: String = ""
+    private var currentUserPhone: String = ""
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -68,11 +72,19 @@ class ProfileActivity : AppCompatActivity() {
     private fun loadProfileDetails() {
         currentUserId = preferenceManager.getString(PreferenceManager.KEY_USER_ID) ?: ""
         currentUserEmail = preferenceManager.getString(PreferenceManager.KEY_EMAIL) ?: ""
+        currentUserPhone = preferenceManager.getString(PreferenceManager.KEY_PHONE) ?: ""
         val name = preferenceManager.getString(PreferenceManager.KEY_NAME) ?: ""
         val imageBase64 = preferenceManager.getString(PreferenceManager.KEY_IMAGE) ?: ""
 
         binding.inputName.setText(name)
-        binding.inputEmail.setText(currentUserEmail) // Strictly Disabled / Non-Editable in XML!
+        val displayIdentity = if (currentUserEmail.isNotEmpty() && currentUserPhone.isNotEmpty()) {
+            "$currentUserEmail ($currentUserPhone)"
+        } else if (currentUserEmail.isNotEmpty()) {
+            currentUserEmail
+        } else {
+            currentUserPhone
+        }
+        binding.inputEmail.setText(displayIdentity) // Strictly Disabled / Non-Editable in XML!
 
         encodedImage = imageBase64
         if (imageBase64.isNotEmpty()) {
@@ -116,14 +128,15 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         val finalImageBase64 = encodedImage ?: AvatarGenerator.generateAvatarBase64(newName)
+        val existingUser = preferenceManager.getAllUsers().firstOrNull { it.id == currentUserId }
 
-        // Email tetap menggunakan currentUserEmail yang paten
         val updatedUser = User(
             id = currentUserId,
             name = newName,
             email = currentUserEmail,
-            password = preferenceManager.findUserByEmail(currentUserEmail)?.password ?: "",
-            imageBase64 = finalImageBase64
+            password = existingUser?.password ?: "",
+            imageBase64 = finalImageBase64,
+            phone = currentUserPhone.ifEmpty { existingUser?.phone ?: "" }
         )
 
         // Simpan ke PreferenceManager lokal dan Firebase
@@ -150,6 +163,12 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun signOut() {
         Toast.makeText(applicationContext, "Signing out...", Toast.LENGTH_SHORT).show()
+        try {
+            FirebaseAuth.getInstance().signOut()
+            GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         // HANYA bersihkan file Sesi "ChatMathSession", JANGAN hapus "ChatMathDatabase" atau Firebase
         preferenceManager.clearSession()
         val intent = Intent(applicationContext, SignInActivity::class.java)

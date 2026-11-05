@@ -27,10 +27,23 @@ class PreferenceManager(context: Context) {
         const val KEY_NAME = "name"
         const val KEY_EMAIL = "email"
         const val KEY_IMAGE = "image"
+        const val KEY_PHONE = "phone"
 
         // Permanent Database Keys
         private const val KEY_USERS_LIST_JSON = "registered_users_json"
         private const val KEY_MESSAGES_LIST_JSON = "messages_list_json"
+
+        fun normalizePhone(rawPhone: String): String {
+            val cleaned = rawPhone.replace("[^0-9+]".toRegex(), "").trim()
+            return when {
+                cleaned.isEmpty() -> ""
+                cleaned.startsWith("+62") -> cleaned
+                cleaned.startsWith("62") -> "+$cleaned"
+                cleaned.startsWith("0") -> "+62${cleaned.substring(1)}"
+                !cleaned.startsWith("+") -> "+62$cleaned"
+                else -> cleaned
+            }
+        }
     }
 
     init {
@@ -78,14 +91,16 @@ class PreferenceManager(context: Context) {
                 name = "Siswa Telkom 1",
                 email = "siswa1@telkom.sch.id",
                 password = "123456",
-                imageBase64 = AvatarGenerator.generateAvatarBase64("Siswa Telkom 1")
+                imageBase64 = AvatarGenerator.generateAvatarBase64("Siswa Telkom 1"),
+                phone = "+628123456001"
             )
             val demo2 = User(
                 id = "demo_siswa2",
                 name = "Siswa Telkom 2",
                 email = "siswa2@telkom.sch.id",
                 password = "123456",
-                imageBase64 = AvatarGenerator.generateAvatarBase64("Siswa Telkom 2")
+                imageBase64 = AvatarGenerator.generateAvatarBase64("Siswa Telkom 2"),
+                phone = "+628123456002"
             )
             saveUser(demo1)
             saveUser(demo2)
@@ -96,7 +111,12 @@ class PreferenceManager(context: Context) {
 
     fun saveUser(user: User) {
         val users = getAllUsers().toMutableList()
-        users.removeAll { it.id == user.id || it.email.equals(user.email, ignoreCase = true) }
+        val normPhone = normalizePhone(user.phone)
+        users.removeAll {
+            it.id == user.id ||
+                (user.email.isNotEmpty() && it.email.equals(user.email, ignoreCase = true)) ||
+                (normPhone.isNotEmpty() && normalizePhone(it.phone) == normPhone)
+        }
         users.add(user)
 
         val jsonArray = JSONArray()
@@ -107,6 +127,7 @@ class PreferenceManager(context: Context) {
                 put("email", u.email)
                 put("password", u.password)
                 put("imageBase64", u.imageBase64)
+                put("phone", u.phone)
             }
             jsonArray.put(obj)
         }
@@ -126,7 +147,8 @@ class PreferenceManager(context: Context) {
                         name = obj.optString("name"),
                         email = obj.optString("email"),
                         password = obj.optString("password"),
-                        imageBase64 = obj.optString("imageBase64")
+                        imageBase64 = obj.optString("imageBase64"),
+                        phone = obj.optString("phone", "")
                     )
                 )
             }
@@ -136,8 +158,22 @@ class PreferenceManager(context: Context) {
         return list
     }
 
-    fun findUserByEmail(email: String): User? {
-        return getAllUsers().firstOrNull { it.email.equals(email, ignoreCase = true) }
+    fun findUserByEmail(emailOrPhone: String): User? {
+        val trimmed = emailOrPhone.trim()
+        if (trimmed.isEmpty()) return null
+        val normPhone = normalizePhone(trimmed)
+        return getAllUsers().firstOrNull { u ->
+            (u.email.isNotEmpty() && u.email.equals(trimmed, ignoreCase = true)) ||
+                (u.phone.isNotEmpty() && (u.phone.equals(trimmed, ignoreCase = true) || normalizePhone(u.phone) == normPhone))
+        }
+    }
+
+    fun findUserByPhone(phone: String): User? {
+        val normPhone = normalizePhone(phone)
+        if (normPhone.isEmpty()) return null
+        return getAllUsers().firstOrNull { u ->
+            u.phone.isNotEmpty() && normalizePhone(u.phone) == normPhone
+        }
     }
 
     fun getCurrentUser(): User? {
@@ -145,7 +181,8 @@ class PreferenceManager(context: Context) {
         val name = getString(KEY_NAME) ?: ""
         val email = getString(KEY_EMAIL) ?: ""
         val image = getString(KEY_IMAGE) ?: ""
-        return User(id = id, name = name, email = email, imageBase64 = image)
+        val phone = getString(KEY_PHONE) ?: ""
+        return User(id = id, name = name, email = email, imageBase64 = image, phone = phone)
     }
 
     // =========================================================================

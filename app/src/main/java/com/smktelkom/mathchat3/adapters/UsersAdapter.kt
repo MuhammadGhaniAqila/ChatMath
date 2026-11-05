@@ -17,7 +17,12 @@ class UsersAdapter(
 
         fun bind(user: User) {
             binding.textName.text = user.name
-            binding.textPhoneOrEmail.text = user.email
+            binding.textPhoneOrEmail.text = when {
+                user.email.isNotEmpty() && user.phone.isNotEmpty() -> "${user.email} • ${user.phone}"
+                user.email.isNotEmpty() -> user.email
+                user.phone.isNotEmpty() -> user.phone
+                else -> "-"
+            }
 
             if (user.imageBase64.isNotEmpty()) {
                 val bitmap = AvatarGenerator.base64ToBitmap(user.imageBase64)
