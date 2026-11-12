@@ -3,12 +3,15 @@ package com.smktelkom.mathchat3.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.smktelkom.mathchat3.R
 import com.smktelkom.mathchat3.databinding.ItemContainerUserBinding
 import com.smktelkom.mathchat3.models.User
 import com.smktelkom.mathchat3.utils.AvatarGenerator
 
 class UsersAdapter(
-    private val users: List<User>,
+    private var users: List<User>,
+    private val isFavorite: (User) -> Boolean,
+    private val onFavoriteClicked: (User) -> Unit,
     private val onUserClicked: (User) -> Unit
 ) : RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
 
@@ -35,10 +38,29 @@ class UsersAdapter(
                 binding.imageProfile.setImageBitmap(AvatarGenerator.generateAvatarBitmap(user.name))
             }
 
+            val fav = isFavorite(user)
+            if (fav) {
+                binding.imageFavoriteStar.setImageResource(R.drawable.ic_star_filled)
+                binding.imageFavoriteStar.contentDescription = "Hapus dari Favorit"
+            } else {
+                binding.imageFavoriteStar.setImageResource(R.drawable.ic_star_outline)
+                binding.imageFavoriteStar.contentDescription = "Tambah ke Favorit"
+            }
+
+            // Klik bintang HANYA toggle favorit, tidak membuka chat
+            binding.imageFavoriteStar.setOnClickListener {
+                onFavoriteClicked(user)
+            }
+
             binding.root.setOnClickListener {
                 onUserClicked(user)
             }
         }
+    }
+
+    fun updateList(newUsers: List<User>) {
+        users = newUsers
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {

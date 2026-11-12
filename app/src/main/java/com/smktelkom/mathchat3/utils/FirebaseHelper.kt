@@ -17,6 +17,7 @@ object FirebaseHelper {
     private const val TAG = "ChatMathFirebase"
     private const val PATH_USERS = "users"
     private const val PATH_CHATS = "chats"
+    private const val PATH_FAVORITES = "favorites"
 
     private val notifiedMessageIds = mutableSetOf<String>()
     private var isInitialLoad = true
@@ -205,6 +206,48 @@ object FirebaseHelper {
                     )
                 }
             }
+        }
+    }
+
+    fun saveFavoriteStatus(currentUserId: String, targetUserId: String, isFavorite: Boolean) {
+        if (currentUserId.isEmpty() || targetUserId.isEmpty()) return
+        try {
+            database.reference.child(PATH_FAVORITES).child(currentUserId).child(targetUserId).setValue(isFavorite)
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception saveFavoriteStatus: ${e.message}", e)
+        }
+    }
+
+    fun listenForFavorites(
+        currentUserId: String,
+        preferenceManager: PreferenceManager,
+        onFavoritesUpdated: (Set<String>) -> Unit
+    ): ValueEventListener {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val favSet = mutableSetOf<String>()
+                for (child in snapshot.children) {
+                    if (child.getValue(Boolean::class.java) == true) {
+                        child.key?.let { favSet.add(it) }
+                    }
+                }
+                preferenceManager.syncFavorites(favSet)
+                onFavoritesUpdated(favSet)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onFavoritesUpdated(preferenceManager.getFavoriteUserIds())
+            }
+        }
+        if (currentUserId.isNotEmpty()) {
+            database.reference.child(PATH_FAVORITES).child(currentUserId).addValueEventListener(listener)
+        }
+        return listener
+    }
+
+    fun removeFavoritesListener(currentUserId: String, listener: ValueEventListener) {
+        if (currentUserId.isNotEmpty()) {
+            database.reference.child(PATH_FAVORITES).child(currentUserId).removeEventListener(listener)
         }
     }
 

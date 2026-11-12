@@ -32,6 +32,7 @@ class PreferenceManager(context: Context) {
         // Permanent Database Keys
         private const val KEY_USERS_LIST_JSON = "registered_users_json"
         private const val KEY_MESSAGES_LIST_JSON = "messages_list_json"
+        private const val KEY_FAVORITES_JSON = "user_favorites_json"
 
         fun normalizePhone(rawPhone: String): String {
             val cleaned = rawPhone.replace("[^0-9+]".toRegex(), "").trim()
@@ -183,6 +184,57 @@ class PreferenceManager(context: Context) {
         val image = getString(KEY_IMAGE) ?: ""
         val phone = getString(KEY_PHONE) ?: ""
         return User(id = id, name = name, email = email, imageBase64 = image, phone = phone)
+    }
+
+    // =========================================================================
+    // MANAGEMENT FAVORITE CONTACTS (ChatMathDatabase)
+    // =========================================================================
+
+    fun getFavoriteUserIds(): Set<String> {
+        val currentUserId = getString(KEY_USER_ID) ?: return emptySet()
+        val jsonStr = databasePrefs.getString("${KEY_FAVORITES_JSON}_$currentUserId", null) ?: return emptySet()
+        val set = mutableSetOf<String>()
+        try {
+            val jsonArray = JSONArray(jsonStr)
+            for (i in 0 until jsonArray.length()) {
+                set.add(jsonArray.getString(i))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return set
+    }
+
+    fun isUserFavorite(targetUserId: String): Boolean {
+        return getFavoriteUserIds().contains(targetUserId)
+    }
+
+    fun toggleUserFavorite(targetUserId: String): Boolean {
+        val currentUserId = getString(KEY_USER_ID) ?: return false
+        val favorites = getFavoriteUserIds().toMutableSet()
+        val isNowFav = if (favorites.contains(targetUserId)) {
+            favorites.remove(targetUserId)
+            false
+        } else {
+            favorites.add(targetUserId)
+            true
+        }
+        val jsonArray = JSONArray()
+        for (id in favorites) {
+            jsonArray.put(id)
+        }
+        databasePrefs.edit().putString("${KEY_FAVORITES_JSON}_$currentUserId", jsonArray.toString()).apply()
+        FirebaseHelper.saveFavoriteStatus(currentUserId, targetUserId, isNowFav)
+        return isNowFav
+    }
+
+    fun syncFavorites(favSet: Set<String>) {
+        val currentUserId = getString(KEY_USER_ID) ?: return
+        val jsonArray = JSONArray()
+        for (id in favSet) {
+            jsonArray.put(id)
+        }
+        databasePrefs.edit().putString("${KEY_FAVORITES_JSON}_$currentUserId", jsonArray.toString()).apply()
     }
 
     // =========================================================================
