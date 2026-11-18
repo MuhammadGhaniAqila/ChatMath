@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/background_dialog_white"
-    android:padding="20dp">
+    android:padding="22dp">
 
     <TextView
         android:id="@+id/textOtpTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Login dengan Nomor HP (OTP)"
+        android:gravity="center"
+        android:text="Masukkan Nomor HP Anda"
         android:textColor="@color/primary"
-        android:textSize="18sp"
+        android:textSize="19sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,35 +23,56 @@
         android:id="@+id/textOtpSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Masukkan nomor handphone aktif untuk menerima kode verifikasi OTP via Firebase Auth:"
-        android:textColor="#4B5563"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:text="ChatMath akan mengirim kode verifikasi OTP 6-digit ke nomor Anda."
+        android:textColor="@color/secondary_text"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textOtpTitle" />
 
-    <!-- Step 1: Input Phone & Name -->
+    <!-- Step 1: Input Phone (Reference 03 style) & Name -->
     <LinearLayout
         android:id="@+id/layoutPhoneInputSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="16dp"
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@id/textOtpSubtitle">
 
-        <EditText
-            android:id="@+id/inputOtpPhone"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@drawable/background_input"
-            android:hint="Nomor HP (contoh: 08123456789)"
-            android:importantForAutofill="no"
-            android:inputType="phone"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:textColor="@color/primary_text"
-            android:textSize="14sp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="58dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/background_input"
+                android:gravity="center"
+                android:text="+62"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/inputOtpPhone"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/background_input"
+                android:hint="812 3456 7890"
+                android:importantForAutofill="no"
+                android:inputType="phone"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/primary_text"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/inputOtpName"
@@ -68,12 +90,12 @@
 
     </LinearLayout>
 
-    <!-- Step 2: Input 6-Digit OTP -->
+    <!-- Step 2: Input 6-Digit OTP (Reference 04 style) -->
     <LinearLayout
         android:id="@+id/layoutOtpCodeSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="16dp"
         android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/layoutPhoneInputSection">
@@ -82,29 +104,30 @@
             android:id="@+id/textOtpStatusInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_formula_box"
+            android:background="@drawable/background_encryption_banner"
+            android:gravity="center"
             android:padding="10dp"
             android:text="Kode OTP 6-digit telah dikirim."
-            android:textColor="@color/primary"
+            android:textColor="@color/encryption_banner_text"
             android:textSize="12sp"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/inputOtpCode"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/background_input"
             android:gravity="center"
-            android:hint="Masukkan 6 Digit Kode OTP"
+            android:hint="• • • • • •"
             android:importantForAutofill="no"
             android:inputType="number"
-            android:letterSpacing="0.2"
+            android:letterSpacing="0.35"
             android:maxLength="6"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
-            android:textColor="@color/primary_text"
-            android:textSize="16sp"
+            android:textColor="@color/primary"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -114,6 +137,7 @@
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_marginTop="12dp"
+        android:indeterminateTint="@color/primary"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -122,7 +146,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="20dp"
         android:gravity="end"
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/progressOtp">
@@ -136,7 +160,7 @@
             android:text="@string/cancel"
             android:textColor="@color/primary_text"
             android:textSize="14sp"
-            app:cornerRadius="8dp"
+            app:cornerRadius="22dp"
             app:strokeColor="#D1D5DB" />
 
         <com.google.android.material.button.MaterialButton
@@ -148,7 +172,7 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:cornerRadius="8dp" />
+            app:cornerRadius="22dp" />
 
     </LinearLayout>
 

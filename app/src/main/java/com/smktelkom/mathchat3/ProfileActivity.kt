@@ -58,10 +58,11 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
         preferenceManager = PreferenceManager(applicationContext)
 
-        // Penanganan System Window Insets agar Header tidak tertutup Status Bar / Kamera
+        // Penanganan System Window Insets agar Header maroon menyatu rapi dengan Status Bar
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.root.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            binding.layoutHeader.setPadding(0, systemBars.top, 0, 0)
+            binding.root.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
 

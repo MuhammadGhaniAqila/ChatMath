@@ -4,193 +4,210 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/primary">
+    android:background="@color/white">
 
-    <!-- Header Bar -->
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageBack"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/background_image"
-        android:backgroundTint="@color/icon_background"
-        android:padding="6dp"
-        android:src="@drawable/ic_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textTitle"
-        android:layout_width="wrap_content"
+    <!-- Maroon Top App Bar (Reference 05 & 12 Style in Red) -->
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_profile"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/imageBack"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/imageBack" />
+        android:background="@color/primary"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Content Card -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="16dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageBack"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Kembali"
+            android:padding="7dp"
+            android:src="@drawable/ic_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/title_profile"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageBack"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/background_content_bottom"
+        android:fillViewport="true"
+        android:padding="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageBack">
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="20dp">
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
+            <!-- Profile Photo Avatar Circle (Reference 05 style) -->
+            <FrameLayout
+                android:id="@+id/layoutImage"
+                android:layout_width="108dp"
+                android:layout_height="108dp"
+                android:layout_marginTop="12dp">
 
-                <!-- Profile Photo Avatar Circle -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_person"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                    app:strokeColor="@color/primary_light"
+                    app:strokeWidth="2dp" />
+
                 <FrameLayout
-                    android:id="@+id/layoutImage"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/background_image">
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/imageProfile"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_person"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/background_circle_primary"
+                    android:elevation="4dp">
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="bottom|end"
-                        android:background="@drawable/background_image"
-                        android:backgroundTint="@color/primary"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
                         android:contentDescription="@string/hint_tap_to_change_photo"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_edit"
+                        android:src="@drawable/ic_camera"
                         app:tint="@color/white" />
 
                 </FrameLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/hint_tap_to_change_photo"
-                    android:textColor="@color/secondary_text"
-                    android:textSize="11sp" />
+            </FrameLayout>
 
-                <!-- Name Input (Editable) -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/label_name"
-                    android:textColor="@color/primary_text"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/hint_tap_to_change_photo"
+                android:textColor="@color/secondary_text"
+                android:textSize="12sp" />
 
-                <EditText
-                    android:id="@+id/inputName"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="6dp"
-                    android:background="@drawable/background_input"
-                    android:hint="@string/name_hint"
-                    android:importantForAutofill="no"
-                    android:inputType="textPersonName"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp" />
+            <!-- Name Input (Editable) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/label_name"
+                android:textColor="@color/primary_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-                <!-- Email Input (Strictly Disabled / Non-Editable) -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/label_email"
-                    android:textColor="@color/primary_text"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+            <EditText
+                android:id="@+id/inputName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/background_input"
+                android:hint="@string/name_hint"
+                android:importantForAutofill="no"
+                android:inputType="textPersonName"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/primary_text"
+                android:textSize="14sp" />
 
-                <EditText
-                    android:id="@+id/inputEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="6dp"
-                    android:background="@drawable/background_input"
-                    android:clickable="false"
-                    android:enabled="false"
-                    android:focusable="false"
-                    android:hint="@string/email_hint"
-                    android:importantForAutofill="no"
-                    android:inputType="textEmailAddress"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:textColor="#757575"
-                    android:textSize="14sp" />
+            <!-- Identity Input (Disabled / Non-Editable) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/label_email"
+                android:textColor="@color/primary_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/hint_email_cannot_be_changed"
-                    android:textColor="@color/secondary_text"
-                    android:textSize="11sp"
-                    android:textStyle="italic" />
+            <EditText
+                android:id="@+id/inputEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/background_input"
+                android:clickable="false"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint="@string/email_hint"
+                android:importantForAutofill="no"
+                android:inputType="textEmailAddress"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="#757575"
+                android:textSize="14sp" />
 
-                <!-- Save Changes Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonSaveProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="24dp"
-                    android:backgroundTint="@color/primary"
-                    android:text="@string/button_save_profile"
-                    android:textColor="@color/white"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="8dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/hint_email_cannot_be_changed"
+                android:textColor="@color/secondary_text"
+                android:textSize="11sp"
+                android:textStyle="italic" />
 
-                <!-- Spacer to push Logout button to the very bottom -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:minHeight="32dp" />
+            <!-- Save Changes Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSaveProfile"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="@color/primary"
+                android:text="@string/button_save_profile"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="25dp" />
 
-                <!-- LOG OUT BUTTON AT THE VERY BOTTOM OF THE PROFILE SCREEN -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonSignOut"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="@string/button_sign_out"
-                    android:textColor="@color/primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="8dp"
-                    app:strokeColor="@color/primary"
-                    app:strokeWidth="1.5dp" />
+            <!-- Spacer to push Logout button to bottom -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:minHeight="32dp" />
 
-            </LinearLayout>
+            <!-- LOG OUT BUTTON -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSignOut"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="12dp"
+                android:text="@string/button_sign_out"
+                android:textColor="@color/primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="25dp"
+                app:strokeColor="@color/primary"
+                app:strokeWidth="1.5dp" />
 
-        </ScrollView>
+        </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

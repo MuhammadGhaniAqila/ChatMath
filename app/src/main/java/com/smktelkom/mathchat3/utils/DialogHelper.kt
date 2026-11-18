@@ -15,6 +15,7 @@ import com.smktelkom.mathchat3.databinding.DialogCustomConfirmBinding
 import com.smktelkom.mathchat3.databinding.DialogCustomInfoBinding
 import com.smktelkom.mathchat3.databinding.DialogCustomLanguageBinding
 import com.smktelkom.mathchat3.databinding.DialogFormulaSettingsBinding
+import com.smktelkom.mathchat3.databinding.PopupChatMenuBinding
 import com.smktelkom.mathchat3.databinding.PopupCustomMenuBinding
 
 object DialogHelper {
@@ -203,6 +204,7 @@ object DialogHelper {
     fun showCustomPopupMenu(
         context: Context,
         anchorView: View,
+        onFormulaClicked: () -> Unit,
         onProfileClicked: () -> Unit,
         onLanguageClicked: () -> Unit
     ) {
@@ -217,6 +219,11 @@ object DialogHelper {
         popupWindow.elevation = 16f
         popupWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        binding.layoutMenuFormula.setOnClickListener {
+            popupWindow.dismiss()
+            onFormulaClicked()
+        }
+
         binding.layoutMenuProfile.setOnClickListener {
             popupWindow.dismiss()
             onProfileClicked()
@@ -225,6 +232,57 @@ object DialogHelper {
         binding.layoutMenuLanguage.setOnClickListener {
             popupWindow.dismiss()
             onLanguageClicked()
+        }
+
+        popupWindow.showAsDropDown(anchorView, -40, 10)
+    }
+
+    fun showChatPopupMenu(
+        context: Context,
+        anchorView: View,
+        isFavorite: Boolean,
+        onToggleFavoriteClicked: () -> Unit,
+        onChooseFormulaClicked: () -> Unit,
+        onRandomizeFormulaClicked: () -> Unit,
+        onFormulaInfoClicked: () -> Unit
+    ) {
+        val binding = PopupChatMenuBinding.inflate(LayoutInflater.from(context))
+        val popupWindow = PopupWindow(
+            binding.root,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            true
+        )
+
+        popupWindow.elevation = 16f
+        popupWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        if (isFavorite) {
+            binding.imageChatMenuFavoriteStar.setImageResource(R.drawable.ic_star_filled)
+            binding.textChatMenuFavorite.text = context.getString(R.string.menu_remove_favorite)
+        } else {
+            binding.imageChatMenuFavoriteStar.setImageResource(R.drawable.ic_star_outline)
+            binding.textChatMenuFavorite.text = context.getString(R.string.menu_add_favorite)
+        }
+
+        binding.layoutChatMenuFavorite.setOnClickListener {
+            popupWindow.dismiss()
+            onToggleFavoriteClicked()
+        }
+
+        binding.layoutChatMenuChooseFormula.setOnClickListener {
+            popupWindow.dismiss()
+            onChooseFormulaClicked()
+        }
+
+        binding.layoutChatMenuRandomize.setOnClickListener {
+            popupWindow.dismiss()
+            onRandomizeFormulaClicked()
+        }
+
+        binding.layoutChatMenuFormulaInfo.setOnClickListener {
+            popupWindow.dismiss()
+            onFormulaInfoClicked()
         }
 
         popupWindow.showAsDropDown(anchorView, -40, 10)

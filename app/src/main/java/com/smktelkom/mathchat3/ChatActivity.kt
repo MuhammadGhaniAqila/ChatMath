@@ -50,7 +50,8 @@ class ChatActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             val bottomPadding = if (ime.bottom > 0) ime.bottom else systemBars.bottom
-            binding.root.setPadding(0, systemBars.top, 0, bottomPadding)
+            binding.layoutHeader.setPadding(0, systemBars.top, 0, 0)
+            binding.root.setPadding(0, 0, 0, bottomPadding)
             insets
         }
 
@@ -92,9 +93,14 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun updateFormulaBanner() {
-        val bannerText = FormulaManager.getFormulaBannerText(this)
-        binding.textFormulaBanner.text = "$bannerText  [Ubah Rumus]"
-        binding.textFormulaStatus.text = bannerText
+        val f = FormulaManager.getActiveFormula(this)
+        val fStr = FormulaManager.formatLinear(f.a, f.b)
+        val gStr = FormulaManager.formatLinear(f.c, f.d)
+        val fogStr = FormulaManager.formatLinear(f.m, f.k)
+
+        binding.textFormulaStatus.text = "Enkripsi aktif: (f∘g)(x) = $fogStr"
+        binding.textFormulaBanner.text =
+            "Pesan dienkripsi dengan f(x)=$fStr, g(x)=$gStr. Ketuk pesan untuk bedah hitungan."
     }
 
     private fun setListeners() {
@@ -102,12 +108,43 @@ class ChatActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.imageChatFormulaInfo.setOnClickListener {
-            showFormulaConfigDialog()
-        }
-
-        binding.textFormulaBanner.setOnClickListener {
-            showFormulaConfigDialog()
+        // Menu titik tiga di pojok kanan atas untuk Favorit kontak, pemilihan & pengaturan rumus
+        binding.imageChatMore.setOnClickListener { anchor ->
+            val isFav = if (::receiverUser.isInitialized) {
+                preferenceManager.isUserFavorite(receiverUser.id)
+            } else {
+                false
+            }
+            DialogHelper.showChatPopupMenu(
+                this,
+                anchor,
+                isFavorite = isFav,
+                onToggleFavoriteClicked = {
+                    if (::receiverUser.isInitialized && receiverUser.id.isNotEmpty()) {
+                        if (preferenceManager.getAllUsers().none { it.id == receiverUser.id }) {
+                            preferenceManager.saveUser(receiverUser)
+                        }
+                        val isNowFav = preferenceManager.toggleUserFavorite(receiverUser.id)
+                        val msg = if (isNowFav) {
+                            "${receiverUser.name} ditambahkan ke Favorit ⭐"
+                        } else {
+                            "${receiverUser.name} dihapus dari Favorit"
+                        }
+                        showToast(msg)
+                    }
+                },
+                onChooseFormulaClicked = {
+                    showFormulaConfigDialog()
+                },
+                onRandomizeFormulaClicked = {
+                    FormulaManager.randomizeFormula(this)
+                    updateFormulaBanner()
+                    showToast("Rumus berhasil diacak: ${FormulaManager.getFormulaBannerText(this)}")
+                },
+                onFormulaInfoClicked = {
+                    showActiveFormulaInfoDialog()
+                }
+            )
         }
 
         binding.layoutSend.setOnClickListener {
@@ -128,6 +165,29 @@ class ChatActivity : AppCompatActivity() {
         DialogHelper.showCustomFormulaDialog(this) {
             updateFormulaBanner()
         }
+    }
+
+    private fun showActiveFormulaInfoDialog() {
+        val f = FormulaManager.getActiveFormula(this)
+        val fStr = FormulaManager.formatLinear(f.a, f.b)
+        val gStr = FormulaManager.formatLinear(f.c, f.d)
+        val fogStr = FormulaManager.formatLinear(f.m, f.k)
+
+        val info = buildString {
+            appendLine("Fungsi Enkripsi Aktif:")
+            appendLine("• f(x) = $fStr")
+            appendLine("• g(x) = $gStr")
+            appendLine("• Komposisi (f ∘ g)(x) = $fogStr")
+            appendLine("• Invers (f ∘ g)⁻¹(c) = (c - (${f.k})) / ${f.m}")
+            appendLine()
+            appendLine("Aturan Kuantifikasi:")
+            appendLine("• Huruf kapital A–Z = 1 s.d. 26")
+            appendLine("• Huruf kecil a–z = -1 s.d. -26")
+            appendLine("• Spasi = 0")
+            appendLine()
+            append("Tip: Gunakan ikon titik tiga (⋮) di pojok kanan atas kapan saja untuk mengganti atau mengacak rumus.")
+        }
+        DialogHelper.showInfoDialog(this, "Info Rumus Enkripsi Aktif", info)
     }
 
     private fun sendMessage() {
@@ -202,7 +262,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun getReadableDateTime(date: Date): String {
-        return SimpleDateFormat("dd MMMM, yyyy - hh:mm a", Locale.getDefault()).format(date)
+        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
     }
 
     private fun showToast(message: String) {

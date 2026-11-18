@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ChatMath</string>
-    <string name="welcome_title">Welcome to ChatMath</string>
+    <string name="welcome_title">Masuk ke ChatMath</string>
     <string name="welcome_subtitle">Masuk untuk mulai mengirim pesan terenkripsi</string>
+    <string name="onboarding_title_line1">Simpel.</string>
+    <string name="onboarding_title_line2">Andal.</string>
+    <string name="onboarding_title_line3">Privat.</string>
+    <string name="onboarding_title_combined">Simple, Andal, Privat</string>
+    <string name="onboarding_subtitle">Kirim pesan rahasia dengan enkripsi komposisi dan invers fungsi matematika.</string>
+    <string name="onboarding_skip">Lewati</string>
+    <string name="onboarding_start">Mulai</string>
+    <string name="splash_from">from</string>
+    <string name="splash_tagline">Enkripsi Komposisi &amp; Invers Fungsi</string>
     <string name="sign_in">Sign In</string>
     <string name="create_account">Create New Account</string>
     <string name="sign_up">Sign Up</string>
@@ -14,11 +23,11 @@
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Konfirmasi Password</string>
     <string name="recent_conversations">Percakapan Terbaru</string>
-    <string name="no_conversations">Belum ada percakapan.\nTekan (+) untuk memilih teman.</string>
+    <string name="no_conversations">Belum ada percakapan.\nKetuk ikon chat di pojok kanan bawah untuk memulai.</string>
     <string name="no_other_users">Belum ada kontak tersimpan.</string>
-    <string name="select_user">Kontak &amp; Teman Favorit</string>
+    <string name="select_user">Pilih Kontak</string>
     <string name="type_message">Ketik pesan...</string>
-    <string name="tap_for_details">Ketuk untuk rincian rumus</string>
+    <string name="tap_for_details">Ketuk untuk bedah perhitungan</string>
     <string name="example_button">Contoh</string>
     <string name="formula_info_button">Info Rumus</string>
 
@@ -28,16 +37,21 @@
     <string name="dont_have_account_signup">Belum punya akun? Daftar Sekarang (Sign Up)</string>
     <string name="already_have_account_signin">Sudah punya akun? Sign In</string>
 
-    <string name="menu_profile">Profil</string>
+    <string name="menu_add_favorite">Tambah ke Favorit</string>
+    <string name="menu_remove_favorite">Hapus dari Favorit</string>
+    <string name="menu_formula">Atur Rumus Enkripsi</string>
+    <string name="menu_randomize_formula">Acak Rumus Baru</string>
+    <string name="menu_formula_info">Info Rumus Aktif</string>
+    <string name="menu_profile">Profil &amp; Pengaturan</string>
     <string name="menu_change_language">Ubah Bahasa</string>
     <string name="menu_sign_out">Keluar Akun</string>
     <string name="select_language">Pilih Bahasa</string>
     <string name="language_indonesian">Bahasa Indonesia</string>
     <string name="language_english">English</string>
-    <string name="title_profile">Profil Pengguna</string>
+    <string name="title_profile">Profil &amp; Pengaturan</string>
     <string name="label_name">Nama Pengguna</string>
-    <string name="label_email">Email (Permanen)</string>
-    <string name="hint_email_cannot_be_changed">Email bersifat paten dan tidak dapat diubah.</string>
+    <string name="label_email">Email / Nomor HP (Permanen)</string>
+    <string name="hint_email_cannot_be_changed">Identitas akun bersifat paten dan tidak dapat diubah.</string>
     <string name="hint_tap_to_change_photo">Ketuk foto untuk mengganti</string>
     <string name="button_save_profile">Simpan Perubahan</string>
     <string name="button_sign_out">Keluar Akun</string>

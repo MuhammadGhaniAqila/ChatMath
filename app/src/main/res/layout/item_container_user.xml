@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:padding="12dp">
+    android:paddingStart="16dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="16dp">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageProfile"
@@ -15,16 +17,20 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
     <TextView
         android:id="@+id/textName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/primary_text"
-        android:textSize="15sp"
+        android:textSize="15.5sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/imageFavoriteStar"
         app:layout_constraintStart_toEndOf="@id/imageProfile"
@@ -34,7 +40,10 @@
         android:id="@+id/textPhoneOrEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/secondary_text"
         android:textSize="13sp"
         app:layout_constraintEnd_toStartOf="@id/imageFavoriteStar"
@@ -43,21 +52,24 @@
 
     <ImageView
         android:id="@+id/imageFavoriteStar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Star Favorite"
-        android:padding="4dp"
+        android:padding="5dp"
         android:src="@drawable/ic_star_outline"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/imageProfile"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/imageProfile" />
 
     <View
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        android:background="#E0E0E0"
+        android:layout_marginTop="11dp"
+        android:background="@color/divider_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/textName"
         app:layout_constraintTop_toBottomOf="@id/imageProfile" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

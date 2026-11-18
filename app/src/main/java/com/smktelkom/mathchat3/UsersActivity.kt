@@ -50,10 +50,11 @@ class UsersActivity : AppCompatActivity() {
         preferenceManager = PreferenceManager(applicationContext)
         currentUserId = preferenceManager.getString(PreferenceManager.KEY_USER_ID) ?: ""
 
-        // Penanganan System Window Insets agar Header tidak tertutup Status Bar / Kamera
+        // Penanganan System Window Insets agar Header maroon menyatu rapi dengan Status Bar
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.root.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            binding.layoutHeader.setPadding(0, systemBars.top, 0, 0)
+            binding.root.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
 
@@ -105,6 +106,10 @@ class UsersActivity : AppCompatActivity() {
             showAddContactDialog()
         }
 
+        binding.imageSearchContact.setOnClickListener {
+            binding.inputSearchContact.requestFocus()
+        }
+
         // Real-time search filter berdasarkan nama, nomor HP, atau email
         binding.inputSearchContact.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -126,6 +131,7 @@ class UsersActivity : AppCompatActivity() {
         usersListener = FirebaseHelper.listenForUsers(this, preferenceManager) { allUsers ->
             loading(false)
             allOtherUsers = allUsers.filter { it.id != currentUserId }
+            binding.textContactCount.text = "${allOtherUsers.size} kontak"
             filterAndDisplayUsers(binding.inputSearchContact.text.toString())
         }
     }
@@ -239,6 +245,7 @@ class UsersActivity : AppCompatActivity() {
 
             dialog.dismiss()
             allOtherUsers = preferenceManager.getAllUsers().filter { it.id != currentUserId }
+            binding.textContactCount.text = "${allOtherUsers.size} kontak"
             filterAndDisplayUsers(binding.inputSearchContact.text.toString())
         }
 

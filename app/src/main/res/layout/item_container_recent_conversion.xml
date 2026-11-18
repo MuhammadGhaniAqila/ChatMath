@@ -4,29 +4,33 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:padding="12dp">
+    android:paddingStart="16dp"
+    android:paddingTop="11dp"
+    android:paddingEnd="16dp">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageProfile"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_person"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
     <TextView
         android:id="@+id/textName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/primary_text"
-        android:textSize="15sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/textTime"
         app:layout_constraintStart_toEndOf="@id/imageProfile"
@@ -37,11 +41,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
+        android:layout_marginEnd="8dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/secondary_text"
-        android:textSize="13sp"
-        app:layout_constraintEnd_toStartOf="@id/textTime"
+        android:textSize="13.5sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/textName"
         app:layout_constraintTop_toBottomOf="@id/textName" />
 
@@ -49,16 +54,19 @@
         android:id="@+id/textTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/chat_time_text"
-        android:textSize="11sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/textName" />
+        android:textColor="@color/secondary_text"
+        android:textSize="11.5sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/textName"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <View
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="12dp"
-        android:background="#E0E0E0"
+        android:background="@color/divider_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/textName"
         app:layout_constraintTop_toBottomOf="@id/imageProfile" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
