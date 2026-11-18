@@ -50,7 +50,8 @@ class ChatActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             val bottomPadding = if (ime.bottom > 0) ime.bottom else systemBars.bottom
-            binding.root.setPadding(0, systemBars.top, 0, bottomPadding)
+            binding.layoutHeader.setPadding(0, systemBars.top, 0, 0)
+            binding.root.setPadding(0, 0, 0, bottomPadding)
             insets
         }
 
@@ -88,11 +89,18 @@ class ChatActivity : AppCompatActivity() {
         if (receiverProfileBitmap == null) {
             receiverProfileBitmap = AvatarGenerator.generateAvatarBitmap(receiverUser.name)
         }
-        binding.imageProfile.setImageBitmap(receiverProfileBitmap)
+        binding.imagePartnerProfile.setImageBitmap(receiverProfileBitmap)
     }
 
     private fun updateFormulaBanner() {
-        binding.textFormulaBanner.text = FormulaManager.getFormulaBannerText(this) + "  [Ubah Rumus]"
+        val f = FormulaManager.getActiveFormula(this)
+        val fStr = FormulaManager.formatLinear(f.a, f.b)
+        val gStr = FormulaManager.formatLinear(f.c, f.d)
+        val fogStr = FormulaManager.formatLinear(f.m, f.k)
+
+        binding.textFormulaStatus.text = "Enkripsi aktif: (f∘g)(x) = $fogStr"
+        binding.textFormulaBanner.text =
+            "Pesan dienkripsi dengan f(x)=$fStr, g(x)=$gStr. Ketuk pesan untuk bedah hitungan."
     }
 
     private fun setListeners() {
@@ -100,18 +108,43 @@ class ChatActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.buttonExample.setOnClickListener {
-            // Tombol pintasan untuk mengisi otomatis "Telkom Purwokerto"
-            binding.inputMessage.setText("Telkom Purwokerto")
-            binding.inputMessage.setSelection(binding.inputMessage.text.length)
-        }
-
-        binding.imageFormula.setOnClickListener {
-            showFormulaConfigDialog()
-        }
-
-        binding.textFormulaBanner.setOnClickListener {
-            showFormulaConfigDialog()
+        // Menu titik tiga di pojok kanan atas untuk Favorit kontak, pemilihan & pengaturan rumus
+        binding.imageChatMore.setOnClickListener { anchor ->
+            val isFav = if (::receiverUser.isInitialized) {
+                preferenceManager.isUserFavorite(receiverUser.id)
+            } else {
+                false
+            }
+            DialogHelper.showChatPopupMenu(
+                this,
+                anchor,
+                isFavorite = isFav,
+                onToggleFavoriteClicked = {
+                    if (::receiverUser.isInitialized && receiverUser.id.isNotEmpty()) {
+                        if (preferenceManager.getAllUsers().none { it.id == receiverUser.id }) {
+                            preferenceManager.saveUser(receiverUser)
+                        }
+                        val isNowFav = preferenceManager.toggleUserFavorite(receiverUser.id)
+                        val msg = if (isNowFav) {
+                            "${receiverUser.name} ditambahkan ke Favorit ⭐"
+                        } else {
+                            "${receiverUser.name} dihapus dari Favorit"
+                        }
+                        showToast(msg)
+                    }
+                },
+                onChooseFormulaClicked = {
+                    showFormulaConfigDialog()
+                },
+                onRandomizeFormulaClicked = {
+                    FormulaManager.randomizeFormula(this)
+                    updateFormulaBanner()
+                    showToast("Rumus berhasil diacak: ${FormulaManager.getFormulaBannerText(this)}")
+                },
+                onFormulaInfoClicked = {
+                    showActiveFormulaInfoDialog()
+                }
+            )
         }
 
         binding.layoutSend.setOnClickListener {
@@ -134,20 +167,40 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    private fun showActiveFormulaInfoDialog() {
+        val f = FormulaManager.getActiveFormula(this)
+        val fStr = FormulaManager.formatLinear(f.a, f.b)
+        val gStr = FormulaManager.formatLinear(f.c, f.d)
+        val fogStr = FormulaManager.formatLinear(f.m, f.k)
+
+        val info = buildString {
+            appendLine("Fungsi Enkripsi Aktif:")
+            appendLine("• f(x) = $fStr")
+            appendLine("• g(x) = $gStr")
+            appendLine("• Komposisi (f ∘ g)(x) = $fogStr")
+            appendLine("• Invers (f ∘ g)⁻¹(c) = (c - (${f.k})) / ${f.m}")
+            appendLine()
+            appendLine("Aturan Kuantifikasi:")
+            appendLine("• Huruf kapital A–Z = 1 s.d. 26")
+            appendLine("• Huruf kecil a–z = -1 s.d. -26")
+            appendLine("• Spasi = 0")
+            appendLine()
+            append("Tip: Gunakan ikon titik tiga (⋮) di pojok kanan atas kapan saja untuk mengganti atau mengacak rumus.")
+        }
+        DialogHelper.showInfoDialog(this, "Info Rumus Enkripsi Aktif", info)
+    }
+
     private fun sendMessage() {
         val plaintext = binding.inputMessage.text.toString().trim()
         if (plaintext.isEmpty()) return
 
-        // Validasi Karakter: Harus huruf A-Z, a-z, atau spasi
         if (!CryptoHelper.isValidText(plaintext)) {
             showToast("Gunakan huruf A-Z, a-z, atau spasi saja!")
             return
         }
 
-        // Ambil rumus aktif saat pesan ini dikirim untuk dikunci di ChatMessage
         val formula = FormulaManager.getActiveFormula(this)
 
-        // Proses Enkripsi Dinamis
         val ciphertext = CryptoHelper.encrypt(plaintext, formula.a, formula.b, formula.c, formula.d)
         val message = ChatMessage(
             senderId = currentUserId,
@@ -164,7 +217,6 @@ class ChatActivity : AppCompatActivity() {
             timestamp = System.currentTimeMillis()
         )
 
-        // Simpan Lokal & Kirim ke Firebase Realtime Database
         preferenceManager.saveChatMessage(message)
         FirebaseHelper.saveChatMessage(message)
 
@@ -180,6 +232,15 @@ class ChatActivity : AppCompatActivity() {
             preferenceManager
         ) { messages ->
             binding.progressBar.visibility = View.GONE
+
+            // Tandai semua pesan masuk dari partner ini sebagai sudah dibaca
+            val incomingIds = messages
+                .filter { it.senderId == receiverUser.id && it.receiverId == currentUserId }
+                .map { it.id }
+            if (incomingIds.isNotEmpty()) {
+                preferenceManager.markMessagesAsRead(currentUserId, incomingIds)
+            }
+
             val adapter = ChatAdapter(
                 messages,
                 receiverProfileBitmap,
@@ -210,7 +271,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun getReadableDateTime(date: Date): String {
-        return SimpleDateFormat("dd MMMM, yyyy - hh:mm a", Locale.getDefault()).format(date)
+        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
     }
 
     private fun showToast(message: String) {

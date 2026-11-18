@@ -1,8 +1,12 @@
 package com.smktelkom.mathchat3.adapters
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.smktelkom.mathchat3.R
 import com.smktelkom.mathchat3.databinding.ItemContainerRecentConversionBinding
 import com.smktelkom.mathchat3.models.ChatMessage
 import com.smktelkom.mathchat3.models.User
@@ -12,6 +16,7 @@ class RecentConversationsAdapter(
     private val chatMessages: List<ChatMessage>,
     private val currentUserId: String,
     private val allUsers: List<User>,
+    private val unreadCounts: Map<String, Int> = emptyMap(),
     private val onConversationClicked: (User) -> Unit
 ) : RecyclerView.Adapter<RecentConversationsAdapter.ConversionViewHolder>() {
 
@@ -19,13 +24,30 @@ class RecentConversationsAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(message: ChatMessage) {
+            val context = binding.root.context
             val otherUserId = if (message.senderId == currentUserId) message.receiverId else message.senderId
             val otherUserName = if (message.senderId == currentUserId) message.receiverName else message.senderName
             val otherUser = allUsers.firstOrNull { it.id == otherUserId }
 
             binding.textName.text = otherUserName
             binding.textRecentMessage.text = message.plaintext
-            binding.textDateTime.text = message.dateTime
+            binding.textTime.text = message.dateTime
+
+            val unreadCount = unreadCounts[otherUserId] ?: 0
+            if (unreadCount > 0) {
+                binding.textUnreadCount.text = if (unreadCount > 99) "99+" else unreadCount.toString()
+                binding.textUnreadCount.visibility = View.VISIBLE
+                binding.textTime.setTextColor(ContextCompat.getColor(context, R.color.primary))
+                binding.textTime.setTypeface(null, Typeface.BOLD)
+                binding.textRecentMessage.setTextColor(ContextCompat.getColor(context, R.color.primary_text))
+                binding.textRecentMessage.setTypeface(null, Typeface.BOLD)
+            } else {
+                binding.textUnreadCount.visibility = View.GONE
+                binding.textTime.setTextColor(ContextCompat.getColor(context, R.color.secondary_text))
+                binding.textTime.setTypeface(null, Typeface.NORMAL)
+                binding.textRecentMessage.setTextColor(ContextCompat.getColor(context, R.color.secondary_text))
+                binding.textRecentMessage.setTypeface(null, Typeface.NORMAL)
+            }
 
             val imageBase64 = otherUser?.imageBase64 ?: ""
             if (imageBase64.isNotEmpty()) {

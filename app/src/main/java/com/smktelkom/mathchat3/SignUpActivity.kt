@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.smktelkom.mathchat3.databinding.ActivitySignUpBinding
 import com.smktelkom.mathchat3.models.User
 import com.smktelkom.mathchat3.utils.AvatarGenerator
@@ -25,6 +26,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignUpBinding
     private lateinit var preferenceManager: PreferenceManager
+    private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private var encodedImage: String? = null
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -84,45 +86,54 @@ class SignUpActivity : AppCompatActivity() {
     private fun signUp() {
         loading(true)
         val name = binding.inputName.text.toString().trim()
-        val phone = binding.inputPhone.text.toString().trim()
+        val rawPhone = binding.inputPhone.text.toString().trim()
+        val normalizedPhone = PreferenceManager.normalizePhone(rawPhone)
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString().trim()
 
-        // Cek terlebih dahulu di database users apakah Email atau No HP tersebut sudah pernah terdaftar
-        if (preferenceManager.findUserByEmailOrPhone(email) != null || (phone.isNotEmpty() && preferenceManager.findUserByEmailOrPhone(phone) != null)) {
+        if (preferenceManager.findUserByEmail(email) != null ||
+            (normalizedPhone.isNotEmpty() && preferenceManager.findUserByPhone(normalizedPhone) != null)
+        ) {
             loading(false)
-            showToast("Akun atau Nomor HP sudah terdaftar, silakan langsung Sign In!")
+            showToast("Email atau Nomor HP sudah terdaftar, silakan langsung Sign In!")
             return
         }
 
-        // Jika foto dari galeri tidak dipilih, buatkan Avatar bulat otomatis dari inisial nama
         val finalImageBase64 = encodedImage ?: AvatarGenerator.generateAvatarBase64(name)
 
-        val user = User(
-            id = UUID.randomUUID().toString(),
-            name = name,
-            phoneNumber = phone,
-            email = email,
-            password = password,
-            imageBase64 = finalImageBase64
-        )
+        // Daftarkan juga ke Firebase Authentication (Email & Password) jika layanan diaktifkan
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                val uid = if (task.isSuccessful) {
+                    task.result?.user?.uid ?: UUID.randomUUID().toString()
+                } else {
+                    UUID.randomUUID().toString()
+                }
 
-        // Simpan Permanen ke ChatMathDatabase & Firebase
-        preferenceManager.saveUser(user)
-        FirebaseHelper.saveUser(user)
+                val user = User(
+                    id = uid,
+                    name = name,
+                    email = email,
+                    password = password,
+                    imageBase64 = finalImageBase64,
+                    phone = normalizedPhone
+                )
 
-        // Aktifkan Sesi Login di ChatMathSession
-        preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
-        preferenceManager.putString(PreferenceManager.KEY_USER_ID, user.id)
-        preferenceManager.putString(PreferenceManager.KEY_NAME, user.name)
-        preferenceManager.putString(PreferenceManager.KEY_PHONE, user.phoneNumber)
-        preferenceManager.putString(PreferenceManager.KEY_EMAIL, user.email)
-        preferenceManager.putString(PreferenceManager.KEY_IMAGE, user.imageBase64)
+                preferenceManager.saveUser(user)
+                FirebaseHelper.saveUser(user)
 
-        showToast("Pendaftaran Berhasil")
-        val intent = Intent(applicationContext, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+                preferenceManager.putBoolean(PreferenceManager.KEY_IS_SIGNED_IN, true)
+                preferenceManager.putString(PreferenceManager.KEY_USER_ID, user.id)
+                preferenceManager.putString(PreferenceManager.KEY_NAME, user.name)
+                preferenceManager.putString(PreferenceManager.KEY_EMAIL, user.email)
+                preferenceManager.putString(PreferenceManager.KEY_IMAGE, user.imageBase64)
+                preferenceManager.putString(PreferenceManager.KEY_PHONE, user.phone)
+
+                showToast("Pendaftaran Berhasil")
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(intent)
+            }
     }
 
     private fun loading(isLoading: Boolean) {
@@ -140,32 +151,41 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun isValidSignUpDetails(): Boolean {
+        val email = binding.inputEmail.text.toString().trim()
+        val phone = binding.inputPhone.text.toString().trim()
+        val password = binding.inputPassword.text.toString().trim()
+        val confirmPassword = binding.inputConfirmPassword.text.toString().trim()
+
         return when {
             binding.inputName.text.toString().trim().isEmpty() -> {
                 showToast("Masukkan Nama")
                 false
             }
-            binding.inputPhone.text.toString().trim().isEmpty() -> {
+            phone.isEmpty() -> {
                 showToast("Masukkan Nomor Handphone")
                 false
             }
-            binding.inputEmail.text.toString().trim().isEmpty() -> {
+            email.isEmpty() -> {
                 showToast("Masukkan Email")
                 false
             }
-            binding.inputPassword.text.toString().trim().isEmpty() -> {
+            password.isEmpty() -> {
                 showToast("Masukkan Password")
                 false
             }
-            binding.inputConfirmPassword.text.toString().trim().isEmpty() -> {
+            password.length < 6 -> {
+                showToast("Password minimal 6 karakter")
+                false
+            }
+            confirmPassword.isEmpty() -> {
                 showToast("Konfirmasi Password Anda")
                 false
             }
-            binding.inputPassword.text.toString().trim() != binding.inputConfirmPassword.text.toString().trim() -> {
+            password != confirmPassword -> {
                 showToast("Password dan Konfirmasi Password harus sama")
                 false
             }
-            preferenceManager.findUserByEmailOrPhone(binding.inputEmail.text.toString().trim()) != null -> {
+            preferenceManager.findUserByEmail(email) != null -> {
                 showToast("Akun sudah terdaftar, silakan langsung Sign In!")
                 false
             }

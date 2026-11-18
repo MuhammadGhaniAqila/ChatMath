@@ -30,8 +30,8 @@ class ChatAdapter(
             val fStr = FormulaManager.formatLinear(message.coeffA, message.coeffB)
             val gStr = FormulaManager.formatLinear(message.coeffC, message.coeffD)
             val fogStr = FormulaManager.formatLinear(message.coeffA * message.coeffC, (message.coeffA * message.coeffD) + message.coeffB)
-            binding.textFormulaLabel.text = "Rumus: f(x)=$fStr, g(x)=$gStr ➔ $fogStr"
-            binding.textCipher.text = "Cipher: ${message.ciphertext}"
+            binding.textFormulaUsed.text = "Rumus: f(x)=$fStr, g(x)=$gStr ➔ $fogStr"
+            binding.textCipherPreview.text = "Cipher: ${message.ciphertext}"
             binding.textDateTime.text = message.dateTime
 
             binding.layoutMessageBubble.setOnClickListener {
@@ -48,8 +48,8 @@ class ChatAdapter(
             val fStr = FormulaManager.formatLinear(message.coeffA, message.coeffB)
             val gStr = FormulaManager.formatLinear(message.coeffC, message.coeffD)
             val fogStr = FormulaManager.formatLinear(message.coeffA * message.coeffC, (message.coeffA * message.coeffD) + message.coeffB)
-            binding.textFormulaLabel.text = "Rumus: f(x)=$fStr, g(x)=$gStr ➔ $fogStr"
-            binding.textCipher.text = "Cipher: ${message.ciphertext}"
+            binding.textFormulaUsed.text = "Rumus: f(x)=$fStr, g(x)=$gStr ➔ $fogStr"
+            binding.textCipherPreview.text = "Cipher: ${message.ciphertext}"
             binding.textDateTime.text = message.dateTime
 
             if (receiverProfileImage != null) {

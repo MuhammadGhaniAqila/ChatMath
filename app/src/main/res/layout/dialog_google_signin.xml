@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_dialog_white"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/textGoogleTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Masuk Cepat dengan Akun Google"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textGoogleSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Pilih akun yang sudah terdaftar atau gunakan Akun Google/HP baru:"
+        android:textColor="#4B5563"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textGoogleTitle" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupGoogleAccounts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        app:layout_constraintTop_toBottomOf="@id/textGoogleSubtitle" />
+
+    <!-- Section Input Akun Baru -->
+    <LinearLayout
+        android:id="@+id/layoutNewAccountInputs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/radioGroupGoogleAccounts">
+
+        <EditText
+            android:id="@+id/inputNewName"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/background_input"
+            android:hint="Nama Pengguna"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/primary_text"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/inputNewEmail"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/background_input"
+            android:hint="Email Google (misal: user@gmail.com)"
+            android:importantForAutofill="no"
+            android:inputType="textEmailAddress"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/primary_text"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/inputNewPhone"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/background_input"
+            android:hint="Nomor Handphone (misal: 08123456789)"
+            android:importantForAutofill="no"
+            android:inputType="phone"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/primary_text"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:gravity="end"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/layoutNewAccountInputs">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonGoogleCancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/cancel"
+            android:textColor="@color/primary_text"
+            android:textSize="14sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="#D1D5DB" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonGoogleProceed"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:backgroundTint="@color/primary"
+            android:text="Masuk Sekarang"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="8dp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

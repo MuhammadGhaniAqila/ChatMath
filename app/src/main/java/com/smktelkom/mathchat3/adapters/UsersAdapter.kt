@@ -1,75 +1,80 @@
 package com.smktelkom.mathchat3.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.smktelkom.mathchat3.R
 import com.smktelkom.mathchat3.databinding.ItemContainerUserBinding
-import com.smktelkom.mathchat3.models.SavedContact
+import com.smktelkom.mathchat3.models.User
 import com.smktelkom.mathchat3.utils.AvatarGenerator
 
 class UsersAdapter(
-    private val contacts: List<SavedContact>,
-    private val onContactClicked: (SavedContact) -> Unit,
-    private val onFavoriteToggled: (SavedContact) -> Unit
-) : RecyclerView.Adapter<UsersAdapter.ContactViewHolder>() {
+    private var users: List<User>,
+    private val isFavorite: (User) -> Boolean,
+    private val onFavoriteClicked: (User) -> Unit,
+    private val onUserClicked: (User) -> Unit
+) : RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
 
-    inner class ContactViewHolder(private val binding: ItemContainerUserBinding) :
+    inner class UserViewHolder(private val binding: ItemContainerUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(contact: SavedContact) {
-            binding.textName.text = contact.customAliasName
-
-            val detailsText = when {
-                contact.phoneNumber.isNotEmpty() && contact.email.isNotEmpty() ->
-                    "${contact.phoneNumber} • ${contact.email}"
-                contact.phoneNumber.isNotEmpty() -> contact.phoneNumber
-                else -> contact.email
-            }
-            binding.textDetails.text = detailsText
-
-            if (contact.isFavorite) {
-                binding.textFavoriteBadge.visibility = View.VISIBLE
-                binding.imageFavoriteStar.setImageResource(R.drawable.ic_star_filled)
-            } else {
-                binding.textFavoriteBadge.visibility = View.GONE
-                binding.imageFavoriteStar.setImageResource(R.drawable.ic_star_outline)
+        fun bind(user: User) {
+            binding.textName.text = user.name
+            binding.textPhoneOrEmail.text = when {
+                user.email.isNotEmpty() && user.phone.isNotEmpty() -> "${user.email} • ${user.phone}"
+                user.email.isNotEmpty() -> user.email
+                user.phone.isNotEmpty() -> user.phone
+                else -> "-"
             }
 
-            if (contact.imageBase64.isNotEmpty()) {
-                val bitmap = AvatarGenerator.base64ToBitmap(contact.imageBase64)
+            if (user.imageBase64.isNotEmpty()) {
+                val bitmap = AvatarGenerator.base64ToBitmap(user.imageBase64)
                 if (bitmap != null) {
                     binding.imageProfile.setImageBitmap(bitmap)
                 } else {
-                    binding.imageProfile.setImageBitmap(AvatarGenerator.generateAvatarBitmap(contact.customAliasName))
+                    binding.imageProfile.setImageBitmap(AvatarGenerator.generateAvatarBitmap(user.name))
                 }
             } else {
-                binding.imageProfile.setImageBitmap(AvatarGenerator.generateAvatarBitmap(contact.customAliasName))
+                binding.imageProfile.setImageBitmap(AvatarGenerator.generateAvatarBitmap(user.name))
             }
 
+            val fav = isFavorite(user)
+            if (fav) {
+                binding.imageFavoriteStar.setImageResource(R.drawable.ic_star_filled)
+                binding.imageFavoriteStar.contentDescription = "Hapus dari Favorit"
+            } else {
+                binding.imageFavoriteStar.setImageResource(R.drawable.ic_star_outline)
+                binding.imageFavoriteStar.contentDescription = "Tambah ke Favorit"
+            }
+
+            // Klik bintang HANYA toggle favorit, tidak membuka chat
             binding.imageFavoriteStar.setOnClickListener {
-                onFavoriteToggled(contact)
+                onFavoriteClicked(user)
             }
 
             binding.root.setOnClickListener {
-                onContactClicked(contact)
+                onUserClicked(user)
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
+    fun updateList(newUsers: List<User>) {
+        users = newUsers
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val binding = ItemContainerUserBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
         )
-        return ContactViewHolder(binding)
+        return UserViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
-        holder.bind(contacts[position])
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        holder.bind(users[position])
     }
 
-    override fun getItemCount(): Int = contacts.size
+    override fun getItemCount(): Int = users.size
 }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_dialog_white"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/textContactTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Simpan Kontak Teman Baru"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textContactSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Masukkan Nomor HP atau Email Google teman:"
+        android:textColor="#4B5563"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textContactTitle" />
+
+    <EditText
+        android:id="@+id/inputContactPhoneOrEmail"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/background_input"
+        android:hint="Nomor HP / Email Teman"
+        android:importantForAutofill="no"
+        android:inputType="textEmailAddress"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:textColor="@color/primary_text"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/textContactSubtitle" />
+
+    <EditText
+        android:id="@+id/inputContactAlias"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/background_input"
+        android:hint="Nama Kontak (Opsional)"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:textColor="@color/primary_text"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/inputContactPhoneOrEmail" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="end"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/inputContactAlias">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonContactCancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/cancel"
+            android:textColor="@color/primary_text"
+            android:textSize="14sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="#D1D5DB" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonContactSave"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:backgroundTint="@color/primary"
+            android:text="Simpan Kontak"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="8dp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
