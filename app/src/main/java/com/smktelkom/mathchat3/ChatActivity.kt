@@ -232,6 +232,15 @@ class ChatActivity : AppCompatActivity() {
             preferenceManager
         ) { messages ->
             binding.progressBar.visibility = View.GONE
+
+            // Tandai semua pesan masuk dari partner ini sebagai sudah dibaca
+            val incomingIds = messages
+                .filter { it.senderId == receiverUser.id && it.receiverId == currentUserId }
+                .map { it.id }
+            if (incomingIds.isNotEmpty()) {
+                preferenceManager.markMessagesAsRead(currentUserId, incomingIds)
+            }
+
             val adapter = ChatAdapter(
                 messages,
                 receiverProfileBitmap,

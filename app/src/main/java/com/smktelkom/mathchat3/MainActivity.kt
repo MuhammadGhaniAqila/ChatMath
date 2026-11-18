@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private var currentUserId: String = ""
     private var allRecentConversations: List<ChatMessage> = emptyList()
     private var allUsersCache: List<User> = emptyList()
+    private var unreadCountsMap: Map<String, Int> = emptyMap()
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loadUserDetails()
+        refreshLocalConversations()
         listenForRecentConversations()
     }
 
@@ -196,8 +198,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun refreshLocalConversations() {
+        currentUserId = preferenceManager.getString(PreferenceManager.KEY_USER_ID) ?: ""
+        allRecentConversations = preferenceManager.getRecentConversations(currentUserId)
+        allUsersCache = preferenceManager.getAllUsers()
+        unreadCountsMap = preferenceManager.getUnreadCountsMap(currentUserId)
+
+        updateChatTabBadge()
+        displayFilteredConversations(binding.inputSearchChats.text.toString())
+    }
+
+    private fun updateChatTabBadge() {
+        val unreadChatsCount = unreadCountsMap.size
+        if (unreadChatsCount > 0) {
+            binding.textChatCount.text = if (unreadChatsCount > 99) "99+" else unreadChatsCount.toString()
+            binding.textChatCount.visibility = View.VISIBLE
+        } else {
+            binding.textChatCount.visibility = View.GONE
+        }
+    }
+
     private fun listenForRecentConversations() {
-        binding.progressBar.visibility = View.VISIBLE
+        if (allRecentConversations.isEmpty()) {
+            binding.progressBar.visibility = View.VISIBLE
+        }
         currentUserId = preferenceManager.getString(PreferenceManager.KEY_USER_ID) ?: ""
 
         chatsListener = FirebaseHelper.listenForRecentConversations(
@@ -208,14 +232,9 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.visibility = View.GONE
             allRecentConversations = recentConversations
             allUsersCache = preferenceManager.getAllUsers()
+            unreadCountsMap = preferenceManager.getUnreadCountsMap(currentUserId)
 
-            if (recentConversations.isNotEmpty()) {
-                binding.textChatCount.text = recentConversations.size.toString()
-                binding.textChatCount.visibility = View.VISIBLE
-            } else {
-                binding.textChatCount.visibility = View.GONE
-            }
-
+            updateChatTabBadge()
             displayFilteredConversations(binding.inputSearchChats.text.toString())
         }
     }
@@ -235,7 +254,8 @@ class MainActivity : AppCompatActivity() {
             val adapter = RecentConversationsAdapter(
                 filtered,
                 currentUserId,
-                allUsersCache
+                allUsersCache,
+                unreadCountsMap
             ) { selectedUser ->
                 val intent = Intent(applicationContext, ChatActivity::class.java)
                 intent.putExtra("user", selectedUser)

@@ -33,6 +33,7 @@ class PreferenceManager(context: Context) {
         private const val KEY_USERS_LIST_JSON = "registered_users_json"
         private const val KEY_MESSAGES_LIST_JSON = "messages_list_json"
         private const val KEY_FAVORITES_JSON = "user_favorites_json"
+        private const val KEY_READ_MESSAGES_JSON = "read_message_ids_json"
 
         fun normalizePhone(rawPhone: String): String {
             val cleaned = rawPhone.replace("[^0-9+]".toRegex(), "").trim()
@@ -319,5 +320,48 @@ class PreferenceManager(context: Context) {
             }
         }
         return recentMap.values.sortedByDescending { it.timestamp }
+    }
+
+    // =========================================================================
+    // MANAGEMENT UNREAD / READ MESSAGES (ChatMathDatabase)
+    // =========================================================================
+
+    fun getReadMessageIds(currentUserId: String): Set<String> {
+        if (currentUserId.isEmpty()) return emptySet()
+        val jsonStr = databasePrefs.getString("${KEY_READ_MESSAGES_JSON}_$currentUserId", null)
+            ?: return emptySet()
+        val set = mutableSetOf<String>()
+        try {
+            val jsonArray = JSONArray(jsonStr)
+            for (i in 0 until jsonArray.length()) {
+                set.add(jsonArray.getString(i))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return set
+    }
+
+    fun markMessagesAsRead(currentUserId: String, messageIds: List<String>) {
+        if (currentUserId.isEmpty() || messageIds.isEmpty()) return
+        val readIds = getReadMessageIds(currentUserId).toMutableSet()
+        if (!readIds.addAll(messageIds)) return
+        val jsonArray = JSONArray()
+        for (id in readIds) {
+            jsonArray.put(id)
+        }
+        databasePrefs.edit().putString("${KEY_READ_MESSAGES_JSON}_$currentUserId", jsonArray.toString()).apply()
+    }
+
+    fun getUnreadCountsMap(currentUserId: String): Map<String, Int> {
+        if (currentUserId.isEmpty()) return emptyMap()
+        val readIds = getReadMessageIds(currentUserId)
+        val counts = mutableMapOf<String, Int>()
+        for (m in getAllChatMessages()) {
+            if (m.receiverId == currentUserId && m.senderId != currentUserId && !readIds.contains(m.id)) {
+                counts[m.senderId] = (counts[m.senderId] ?: 0) + 1
+            }
+        }
+        return counts
     }
 }
